@@ -1,0 +1,40 @@
+{
+  "author": "Ethan Thai <c0866206@mylambton.ca>",
+  "name": "functions",
+  "description": "Cloud Functions for Firebase",
+  "scripts": {
+    "lint": "eslint .",
+    "serve": "firebase emulators:start --only functions",
+    "shell": "firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log"
+  },
+  "engines": {
+    "node": "16"
+  },
+  "main": "app.js",
+  "dependencies": {
+    "consolidate": "^0.16.0",
+    "express": "^4.18.2",
+    "file-system": "^2.2.2",
+    "firebase-admin": "^11.5.0",
+    "firebase-functions": "^4.2.1",
+    "formidable": "^2.1.1",
+    "fs-extra": "^11.1.0",
+    "handlebars": "^4.7.7",
+    "multer": "^1.4.4",
+    "node-notifier": "^10.0.1",
+    "path": "^0.12.7",
+    "progress-stream": "^2.0.0",
+    "request": "^2.88.2",
+    "toast-me": "^1.4.14",
+    "toastify-js": "^1.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.15.0",
+    "eslint-config-google": "^0.14.0",
+    "firebase-functions-test": "^3.0.0"
+  },
+  "private": true
+}

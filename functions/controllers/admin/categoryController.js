@@ -45,7 +45,6 @@ const addCategory = async (req, res, next) => {
     data.status = data.status == "on" ? true : false;
     data.created_date = Math.floor(Date.now() / 1000);
     data.modified_date = Math.floor(Date.now() / 1000);
-    console.log("data: ",data);
     const writeResult = await categoriesCollection.add({
       name: data.name,
       picture: data.picture,
@@ -70,7 +69,7 @@ const deleteCategory = async (req, res, next) => {
   try {
     const id = req.body.categoryId;
     console.log("Deleting category= %s", id);
-    await categoriesCollection.doc(id).delete();
+    // await categoriesCollection.doc(id).delete();
     const deleteResult = categoriesCollection.doc(id).delete()
       .then(function() {
         console.log("Document successfully deleted!");
@@ -82,48 +81,51 @@ const deleteCategory = async (req, res, next) => {
   }
 };
 
-
-/* 
-
-
-
-const getCategory = async (req, res, next) => {
+const getCategory = async (id) => {
   try {
-    const id = req.params.id;
     console.log("Getting category= %s", id);
-    const category = await fireStore.collection("categories").doc(id);
-    const data = await category.get();
-    if (!data.exists) {
-      res.status(404).json({ message: "Record not found" });
+    const data = await categoriesCollection.doc(id).get();
+    const category = data.data();
+    if (!category.exists) {
+      return category;
     } else {
-      res.status(200).json(data.data());
+      return null;
     }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
+
 const updateCategory = async (req, res, next) => {
+  console.log('updating cat');
+  const id = req.params.id;
+  const data = req.body;
+  data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
+  data.status = data.status == "on" ? true : false;
+  data.modified_date = Math.floor(Date.now() / 1000);
+  // console.log(data);
   try {
-    const id = req.params.id;
-    console.log("Updating category= %s", id);
     const data = req.body;
-    const category = await fireStore.collection("categories").doc(id);
-    await category.update(data);
-    res.status(204).json({ message: "Record updated successfully" });
+    const id = data.id;
+    console.log("Updating category= %s", id);
+    const category = await categoriesCollection.doc(id);
+    // await category.update(data);
+    const updateResult = category.update(data)
+      .then(function() {
+        console.log("Document successfully updated!");
+        res.redirect('/admin/category/index');
+      })
+      .catch(function(error) {console.error("Error deleting document: ", error);});
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
- */
-
-// todo - add delete all employees
-
 module.exports = {
   addCategory,
   getAllCategories,
-  // getCategory,
-  // updateCategory,
+  getCategory,
+  updateCategory,
   deleteCategory
 };

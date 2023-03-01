@@ -51,6 +51,7 @@ const adminDashboardRouter = require("./routes/admin/dashboard");
 
 const adminCategoryRouter = require("./routes/admin/category/index");
 const adminAddCategoryRouter = require("./routes/admin/category/add");
+const adminEditCategoryRouter = require("./routes/admin/category/edit");
 
 
 app.use("/index", indexRouter);
@@ -62,6 +63,7 @@ app.use("/admin/dashboard", adminDashboardRouter);
 
 app.use("/admin/category/index", adminCategoryRouter);
 app.use("/admin/category/add", adminAddCategoryRouter);
+app.use("/admin/category/edit", adminEditCategoryRouter);
 
 
 // add breadcrumbs

@@ -56,12 +56,33 @@ const addCategory = async (req, res, next) => {
       created_date: data.created_date,
       modified_date: data.modified_date
     })
-    .then(function() {console.log("Document successfully written!");})
+    .then(function() {
+      console.log("Document successfully written!");
+      res.redirect('/admin/category/index');
+    })
     .catch(function(error) {console.error("Error writing document: ", error);});
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
+const deleteCategory = async (req, res, next) => {
+  try {
+    const id = req.body.categoryId;
+    console.log("Deleting category= %s", id);
+    await categoriesCollection.doc(id).delete();
+    const deleteResult = categoriesCollection.doc(id).delete()
+      .then(function() {
+        console.log("Document successfully deleted!");
+        res.redirect('/admin/category/index');
+      })
+      .catch(function(error) {console.error("Error deleting document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+
 /* 
 
 
@@ -95,16 +116,7 @@ const updateCategory = async (req, res, next) => {
   }
 };
 
-const deleteCategory = async (req, res, next) => {
-  try {
-    const id = req.params.id;
-    console.log("Deleting category= %s", id);
-    await fireStore.collection("categories").doc(id).delete();
-    res.status(204).json({ message: "Record deleted successfully" });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-}; */
+ */
 
 // todo - add delete all employees
 
@@ -113,5 +125,5 @@ module.exports = {
   getAllCategories,
   // getCategory,
   // updateCategory,
-  // deleteCategory
+  deleteCategory
 };

@@ -17,7 +17,7 @@ const {
   getAllCategories,
   // getCategory,
   // updateCategory,
-  // deleteCategory
+  deleteCategory
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
@@ -48,6 +48,9 @@ app.get('/', isLoggedIn, async (req,res) =>{
       data
   });
 });
+
+app.post('/delete', isLoggedIn, deleteCategory);
+
   
 
 module.exports = app

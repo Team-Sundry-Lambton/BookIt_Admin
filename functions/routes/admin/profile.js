@@ -47,24 +47,21 @@ app.use(function(req, res, next) {
         const {firstname, lastname, phone} = req.body;
         const querySnapshot = await adminsCollection.where('email', '==', email).get();
         if (!querySnapshot.empty) {
-            const doc = querySnapshot.docs[0];
-            const docRef = doc.ref;
-            await docRef.update({ firstname: firstname, lastname: lastname, phone: phone });
+          const doc = querySnapshot.docs[0];
+          const docRef = doc.ref;
+          await docRef.update({ firstname: firstname, lastname: lastname, phone: phone });
 
-            // Create session
-            const querySnapshotUpdated = await adminsCollection.where('email', '==', email).get();
-            const docUpdated = querySnapshotUpdated.docs[0];
-            adminUser = docUpdated.data();
-            req.session.user = adminUser;
-
-            return res.send('Updated profile successfully');
-
-          } else {
-          return res.send('User not found');
+          // Create session
+          const querySnapshotUpdated = await adminsCollection.where('email', '==', email).get();
+          const docUpdated = querySnapshotUpdated.docs[0];
+          adminUser = docUpdated.data();
+          req.session.user = adminUser;
+          //return res.send('Updated profile successfully');
         }
+        res.redirect('/admin/profile');
       } catch (error) {
         console.error(error);
-        return res.status(500).send('An error occurred while updating the password');
+        return res.status(500).send('An error occurred while updating the profile');
       }
     } else {
       res.redirect('/admin/login');

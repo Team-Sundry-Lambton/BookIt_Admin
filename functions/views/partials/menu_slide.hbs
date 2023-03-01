@@ -2,7 +2,7 @@
 <nav class="side-nav">
   <ul>
     <li>
-      <a href="/admin/dashboard" class="side-menu {{#ifCond currentUrl '==' '/admin/dashboard'}} side-menu--active{{/ifCond}}">
+      <a href="/admin/dashboard" class="side-menu {{#ifUrlIncludes currentUrl "/admin/dashboard"}} side-menu--active {{/ifUrlIncludes}}">
         <div class="side-menu__icon">
           <i data-lucide="home"></i>
         </div>
@@ -19,9 +19,9 @@
     </li>
     <li class="side-nav__devider my-6"></li>
     <li>
-      <a href="/admin/category/index" class="side-menu {{#ifCond currentUrl '==' '/admin/category/index'}} side-menu--active{{/ifCond}}">
+      <a href="/admin/category/index" class="side-menu {{#ifUrlIncludes currentUrl "/admin/category"}} side-menu--active {{/ifUrlIncludes}}">
         <div class="side-menu__icon">
-          <i data-lucide="database"></i>
+          <i data-lucide="layers"></i>
         </div>
         <div class="side-menu__title"> Category </div>
       </a>
@@ -29,7 +29,7 @@
     <li>
       <a href="javascript:;" class="side-menu">
         <div class="side-menu__icon">
-          <i data-lucide="shopping-bag"></i>
+          <i data-lucide="user-plus"></i>
         </div>
         <div class="side-menu__title"> Vendor <div class="side-menu__sub-icon ">
             <i data-lucide="chevron-down"></i>
@@ -153,7 +153,7 @@
     <li>
       <a href="javascript:;" class="side-menu">
         <div class="side-menu__icon">
-          <i data-lucide="users"></i>
+          <i data-lucide="user-check"></i>
         </div>
         <div class="side-menu__title"> Clients <div class="side-menu__sub-icon ">
             <i data-lucide="chevron-down"></i>
@@ -191,28 +191,24 @@
     <li class="side-nav__devider my-6"></li>
     
     <li>
-      <a href="javascript:;" class="side-menu">
+      <a href="/admin/profile" class="side-menu">
         <div class="side-menu__icon">
           <i data-lucide="settings"></i>
         </div>
-        <div class="side-menu__title"> System <div class="side-menu__sub-icon ">
-            <i data-lucide="chevron-down"></i>
-          </div>
-        </div>
+        <div class="side-menu__title"> Admins </div>
       </a>
-      <ul class="">
-        <li style="margin-left:30px">
-          <a href="http://enigma.left4code.com/page/side-menu/light/chart" class="side-menu">
-            <div class="side-menu__icon">
-              <i data-lucide="users"></i>
-            </div>
-            <div class="side-menu__title"> Admins </div>
-          </a>
-        </li>
-      </ul>
     </li>
+
     <li class="side-nav__devider my-6"></li>
 
+    <li>
+      <a href="/admin/profile" class="side-menu">
+        <div class="side-menu__icon">
+          <i data-lucide="user"></i>
+        </div>
+        <div class="side-menu__title"> Profile </div>
+      </a>
+    </li>
     <li>
       <a href="/admin/login/logout" class="side-menu">
         <div class="side-menu__icon">

@@ -261,3 +261,12 @@ Handlebars.registerHelper('ifCond2', function(v1, v2, options) {
   }
   return options.inverse(this);
 });
+
+
+Handlebars.registerHelper('ifUrlIncludes', function(v1, v2, options) {
+  if (v1.includes(v2)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+});

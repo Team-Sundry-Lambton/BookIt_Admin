@@ -68,14 +68,15 @@ app.use("/admin/category/edit", adminEditCategoryRouter);
 
 // add breadcrumbs
 get_breadcrumbs = function(url) {
-  var rtn = [{name: "HOME", url: "/"}],
+  var rtn = [{name: "HOME", url: "/admin/dashboard"}],
       acc = "", // accumulative url
       arr = url.substring(1).split("/");
 
   for (i=0; i<arr.length; i++) {
     if(arr[i].toUpperCase() != "ADMIN"){
       acc = i != arr.length-1 ? acc+"/"+arr[i] : null;
-      rtn[i+1] = {name: arr[i].toUpperCase().replace('-', ' '), url: acc};
+      rtn[i+1] = {name: arr[i].toUpperCase().replace('-', ' '), url: ''};
+      // rtn[i+1] = {name: arr[i].toUpperCase().replace('-', ' '), url: acc};
     }
   }
   return rtn;

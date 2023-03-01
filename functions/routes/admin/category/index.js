@@ -35,17 +35,26 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/', isLoggedIn, async (req,res) =>{
+app.get('/',isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
-  var data = await getAllCategories();
+  var page = parseInt(req.query.page) || 1;
+  var limit = parseInt(req.query.limit) || global.perPage;
+  const data = await getAllCategories(limit,page);
+
   res.render('./admin/category/index',{
       adminUser, 
       currentUrl, 
       pageName: "Category",
       title: global.title,
       breadcrumbs: req.breadcrumbs,
-      data
+      data: data.categories,
+      total: data.totalCount,
+      next: data.next,
+      pages: Math.ceil(data.totalCount / limit),
+      currentPage: page,
+      nextPage: page+1,
+      prevPage: page-1
   });
 });
 

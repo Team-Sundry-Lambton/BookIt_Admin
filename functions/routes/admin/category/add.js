@@ -14,7 +14,7 @@ const path = require('path');
 const rootFolder = process.cwd();
 const {
   addCategory,
-  getAllCategories,
+  getListCategories,
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
@@ -35,7 +35,7 @@ app.use(function(req, res, next) {
 app.get('/', isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
-  var categories = await getAllCategories();
+  var categories = await getListCategories();
   res.render('./admin/category/add',{
       adminUser, 
       currentUrl, 

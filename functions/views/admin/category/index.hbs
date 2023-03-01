@@ -31,7 +31,7 @@
                     </ul>
                 </div> 
             </div> --}}
-            <div class="hidden md:block mx-auto text-slate-500">{{data.length}} entries</div>
+            <div class="hidden md:block mx-auto text-slate-500">Page {{currentPage}} - Showing {{data.length}} of {{total}} entries</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
                     <input type="text" class="form-control w-56 box pr-10" placeholder="Search...">
@@ -98,43 +98,47 @@
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-row sm:flex-nowrap items-center">
             <nav class="w-full sm:w-auto sm:mr-auto">
                 <ul class="pagination">
+                    {{#ifCond currentPage '!==' 1}}
                     <li class="page-item">
-                        <a class="page-link" href="#">
+                        <a class="page-link" href="/admin/category/index">
                             <i class="w-4 h-4" data-lucide="chevrons-left"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="#">
+                        <a class="page-link" href="/admin/category/index?page={{prevPage}}">
                             <i class="w-4 h-4" data-lucide="chevron-left"></i>
                         </a>
                     </li>
+                    {{/ifCond}}
+
+                    {{#times pages}}
+                        <li class="page-item">
+                            <a class="page-link" href="/admin/category/index?page={{this}}">{{this}}</a>
+                        </li>
+                    {{/times}}
+
+                    {{#ifCond pages '!==' currentPage}}
                     <li class="page-item">
-                        <a class="page-link" href="#">...</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">1</a>
-                    </li>
-                    <li class="page-item active">
-                        <a class="page-link" href="#">2</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">3</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">...</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">
+                        <a class="page-link" href="/admin/category/index?page={{nextPage}}">
                             <i class="w-4 h-4" data-lucide="chevron-right"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="#">
+                        <a class="page-link" href="/admin/category/index?page={{pages}}">
                             <i class="w-4 h-4" data-lucide="chevrons-right"></i>
                         </a>
                     </li>
+                    {{/ifCond}}
+                    
                 </ul>
             </nav>
+            {{!-- <select class="w-20 form-select box mt-3 sm:mt-0" onchange="updateResultsPerPage()">
+                <option>4</option>
+                <option>10</option>
+                <option>25</option>
+                <option>35</option>
+                <option>50</option>
+            </select> --}}
         </div>
         <!-- END: Pagination -->
     </div>
@@ -173,6 +177,45 @@
                     document.getElementById('categoryIdInput').value = categoryId;
                 });
             });
+
+            function updateResultsPerPage() {
+                var selectElement = document.querySelector('.form-select');
+                var selectedOption = selectElement.options[selectElement.selectedIndex].value;
+                
+                // Get the current URL
+                var url = window.location.href;
+                
+                // Split the URL into base and query string parts
+                var parts = url.split('?');
+                var base = parts[0];
+                var query = parts[1] || '';
+                
+                // Split the query string into individual parameter=value pairs
+                var params = query.split('&');
+                var newParams = [];
+                
+                // Replace the limit parameter value with the selected option value
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i].split('=');
+                    if (param[0] === 'limit') {
+                        newParams.push('limit=' + selectedOption);
+                    } else {
+                        newParams.push(params[i]);
+                    }
+                }
+                
+                // If the limit parameter wasn't found, add it to the end of the query string
+                if (newParams.indexOf('limit=' + selectedOption) === -1) {
+                    newParams.push('limit=' + selectedOption);
+                }
+                
+                // Combine the base URL and the new query string
+                var newUrl = base + '?' + newParams.join('&');
+                
+                // Redirect the browser to the new URL
+                window.location.href = newUrl;
+            }
+
 
         </script>
 

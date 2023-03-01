@@ -13,6 +13,7 @@ hbs.registerHelper('xif', xifHelper);
 global.title = "BookIt";
 app.set('views','./views');
 app.set('view engine', 'hbs');
+global.perPage = 8;
 
 // Serve static files from the public directory
 app.use(express.static('public'));
@@ -75,12 +76,17 @@ get_breadcrumbs = function(url) {
   for (i=0; i<arr.length; i++) {
     if(arr[i].toUpperCase() != "ADMIN"){
       acc = i != arr.length-1 ? acc+"/"+arr[i] : null;
-      rtn[i+1] = {name: arr[i].toUpperCase().replace('-', ' '), url: ''};
+      var name = arr[i].toUpperCase().replace('-', ' ');
+      if (name.includes("?")) {
+        name = name.substring(0, name.indexOf("?"));
+      }
+      rtn[i+1] = {name: name, url: ''};
       // rtn[i+1] = {name: arr[i].toUpperCase().replace('-', ' '), url: acc};
     }
   }
   return rtn;
 };
+
 
 app.use(function(req, res, next) {
   req.breadcrumbs = get_breadcrumbs(req.originalUrl);

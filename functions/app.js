@@ -49,6 +49,9 @@ const adminProfileRouter = require("./routes/admin/profile");
 const adminChangPasswordRouter = require("./routes/admin/change_password");
 const adminDashboardRouter = require("./routes/admin/dashboard");
 
+const adminCategoryRouter = require("./routes/admin/category/index");
+const adminAddCategoryRouter = require("./routes/admin/category/add");
+
 
 app.use("/index", indexRouter);
 app.use("/admin/login", loginRouter);
@@ -56,6 +59,9 @@ app.use("/admin/register", registerRouter);
 app.use("/admin/profile", adminProfileRouter);
 app.use("/admin/change-password", adminChangPasswordRouter);
 app.use("/admin/dashboard", adminDashboardRouter);
+
+app.use("/admin/category/index", adminCategoryRouter);
+app.use("/admin/category/add", adminAddCategoryRouter);
 
 
 // add breadcrumbs
@@ -81,7 +87,7 @@ app.use(function(req, res, next) {
 app.get('/', async (req,res) =>{
   res.render('index',{
     pageName: "Frontend",
-    title: global.title
+    title: global.title,
   });
 });
 

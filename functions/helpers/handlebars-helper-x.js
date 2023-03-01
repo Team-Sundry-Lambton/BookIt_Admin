@@ -242,3 +242,8 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
           return options.inverse(this);
   }
 });
+
+const moment = require('moment');
+Handlebars.registerHelper('formatDate', function(date) {
+  return moment(date).format('MMMM Do YYYY, h:mm:ss a');
+});

@@ -143,8 +143,10 @@
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
                                         <div class="form-check form-switch">
-                                            <input id="category-status" name="status" class="form-check-input" type="checkbox" {{#if category.status}}checked{{/if}}>
-                                            <label class="form-check-label" for="category-status">{{#if category.status}}Active{{else}}Inactive{{/if}}</label>
+                                            <input id="item-status-active" name="status" class="form-check-input" type="checkbox" {{#if category.status}}checked{{/if}}>
+                                            <label class="form-check-label" for="item-status-active">
+                                                <span id="status-text">{{#if category.status}}Active{{else}}Inactive{{/if}}</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -177,6 +179,15 @@
         <!-- END: Content -->
         <script src="https://cdn.ckeditor.com/4.9.1/standard/ckeditor.js"></script>
         <script>
+            const changeStatusBtn = document.getElementById('item-status-active');
+            changeStatusBtn.addEventListener('click', function() {
+                if(this.checked) {
+                    document.getElementById('status-text').textContent = "Active";
+                } else {
+                    document.getElementById('status-text').textContent = "Inactive";
+                }
+            });
+
             function cancel() {
                 window.location.href = "/admin/category/index";
             }

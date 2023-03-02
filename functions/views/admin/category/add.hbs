@@ -26,9 +26,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="w-full mt-3 xl:mt-0 flex-1">
+                                    <div class="w-full mt-3 xl:mt-0 flex-1" id="divName">
                                         <input id="name" name="name" type="text" class="form-control" placeholder="Name of item">
-                                        <div class="form-help text-right">Maximum character 0/70</div>
+                                        <div class="pristine-error text-left text-danger mt-2" id="divNameLabel" style="display:none">This field is required</div>
                                     </div>
                                 </div>
                                 <div class="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
@@ -143,8 +143,8 @@
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
                                         <div class="form-check form-switch">
-                                            <input id="product-status-active" name="status" class="form-check-input" type="checkbox">
-                                            <label class="form-check-label" for="product-status-active">Active</label>
+                                            <input id="item-status-active" name="status" class="form-check-input" type="checkbox">
+                                            <label class="form-check-label" for="item-status-active"><span id="status-text">Inactive</span></label>
                                         </div>
                                     </div>
                                 </div>
@@ -165,9 +165,11 @@
                     </div>
                     <!-- END: Product Management -->
                     <div class="flex justify-end flex-col md:flex-row gap-2 mt-5">
-                        <span id="password-error" style="color: red;"></span>
                         <button type="button" onclick="cancel()" class="btn py-3 border-slate-300 dark:border-darkmode-400 text-slate-500 w-full md:w-52">Cancel</button>
                         <button type="submit" class="btn py-3 btn-primary w-full md:w-52">Save</button>
+                    </div>
+                    <div class="flex justify-end flex-col md:flex-row gap-2 mt-5">
+                        <span id="password-error" style="color: red;"></span>
                     </div>
                     </form>
                 </div>
@@ -176,6 +178,15 @@
         <!-- END: Content -->
         <script src="https://cdn.ckeditor.com/4.9.1/standard/ckeditor.js"></script>
         <script>
+            const changeStatusBtn = document.getElementById('item-status-active');
+            changeStatusBtn.addEventListener('click', function() {
+                if(this.checked) {
+                    document.getElementById('status-text').textContent = "Active";
+                } else {
+                    document.getElementById('status-text').textContent = "Inactive";
+                }
+            });
+
             function cancel() {
                 window.location.href = "/admin/category/index";
             }
@@ -196,6 +207,36 @@
                     avatarImg.src = reader.result;
                 };
                 reader.readAsDataURL(file);
+            });
+
+            const add_form = document.getElementById("add-form");
+            const password_error = document.getElementById("password-error");
+            
+            const name = document.getElementById("name");
+            const divName = document.getElementById("divName");
+            const divNameLabel = document.getElementById("divNameLabel");
+
+            // Define a validation function to check the name input
+            function validateName() {
+            if (name.value.trim() === "") {
+                divName.classList.add("has-error");
+                divNameLabel.style.display = "block";
+                return false; 
+            } else {
+                divName.classList.remove("has-error");
+                divNameLabel.style.display = "none";
+                return true;
+            }
+            }
+            name.addEventListener("blur", validateName);
+
+            add_form.addEventListener("submit", function(event) {
+                if (name.value === "") { 
+                    password_error.innerHTML = "Please fill all required fields";
+                    event.preventDefault(); // prevent form submission
+                } else {
+                    password_error.innerHTML = "";
+                }
             });
         </script>
     {{> footer}}

@@ -145,6 +145,10 @@ const updateCategory = async (req, res, next) => {
   data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
   data.status = data.status == "on" ? true : false;
   data.modified_date = Math.floor(Date.now() / 1000);
+  if(data.item_order == ""){
+    var maxItemOrder = await getMaxItemOrderOfCategories();
+    data.item_order = maxItemOrder + 1;
+  }
   data.item_order = parseInt(data.item_order);
   try {
     const data = req.body;
@@ -162,11 +166,25 @@ const updateCategory = async (req, res, next) => {
   }
 };
 
+async function getMaxItemOrderOfCategories() {
+  try {
+    const querySnapshot = await categoriesCollection.orderBy('item_order', 'desc').limit(1).get();
+    const maxOrderDoc = querySnapshot.docs[0];
+    const maxItemOrder = maxOrderDoc.data().item_order;
+    
+    return maxItemOrder;
+  } catch (err) {
+    console.log('Error getting documents', err);
+    throw err;
+  }
+}
+
 module.exports = {
   addCategory,
   getAllCategories,
   getCategory,
   updateCategory,
   deleteCategory,
-  getListCategories
+  getListCategories,
+  getMaxItemOrderOfCategories
 };

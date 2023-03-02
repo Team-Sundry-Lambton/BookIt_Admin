@@ -15,6 +15,7 @@ const rootFolder = process.cwd();
 const {
   addCategory,
   getListCategories,
+  getMaxItemOrderOfCategories
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
@@ -36,13 +37,15 @@ app.get('/', isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
   var categories = await getListCategories();
+  var maxItemOrder = await getMaxItemOrderOfCategories();
   res.render('./admin/category/add',{
       adminUser, 
       currentUrl, 
       pageName: "Add Category",
       title: global.title,
       breadcrumbs: req.breadcrumbs,
-      categories
+      categories,
+      maxItemOrder: maxItemOrder + 1
   });
 });
 

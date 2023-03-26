@@ -4,7 +4,7 @@
                 <h2 class="intro-y text-lg font-medium mt-10">{{pageName}}</h2>
     <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <button class="btn btn-primary shadow-md mr-2" onclick="add()"><i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add New Category</button>
+            <button class="btn btn-primary shadow-md mr-2" onclick="add()"><i data-lucide="plus" class="w-4 h-4 mr-2"></i> Add New Service</button>
             {{!-- <div class="dropdown">
                 <button class="dropdown-toggle btn px-2 box" aria-expanded="false" data-tw-toggle="dropdown">
                     <span class="w-5 h-5 flex items-center justify-center">
@@ -44,8 +44,14 @@
             <table class="table table-report -mt-2">
                 <thead>
                     <tr>
-                        <th class="whitespace-nowrap">PICTURES</th>
-                        <th class="whitespace-nowrap">NAME</th>
+                        <th class="whitespace-nowrap">Picture</th>
+                        <th class="whitespace-nowrap">Title</th>
+                        <th class="whitespace-nowrap">Location</th>
+                        <th class="whitespace-nowrap">Price</th>
+                        <th class="whitespace-nowrap">Vendor</th>
+                        <th class="whitespace-nowrap">Category</th>
+                        <th class="whitespace-nowrap">Equipment</th>
+                        <th class="whitespace-nowrap">Cancel Policy</th>
                         <th class="text-center whitespace-nowrap">ACTIONS</th>
                     </tr>
                 </thead>
@@ -54,25 +60,44 @@
                     <tr class="intro-x">
                         
                         <td class="w-40">
-                            <div class="w-10 h-10 image-fit zoom-in">
-                                <img id="avatar" class="tooltip rounded-full" title="{{this.name}}" src="{{this.picture}}">
+                            <div class="flex">
+                                {{#each this.medias}}
+                                <div class="w-10 h-10 image-fit zoom-in">
+                                    <img alt="" class="rounded-full" src="{{this.mediaPath}}" title=""> 
+                                </div>
+                                {{/each}}
                             </div>
                         </td>
                         <td>
-                            <a href="/admin/category/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.name}}</a>
+                            <a href="/admin/service/edit/{{this.serviceId}}" class="font-medium whitespace-nowrap">{{this.serviceTitle}}</a><br/>
+                            {{this.serviceDescription}}
                         </td>
-                        
-                        {{!-- <td class="w-40">
-                            <div class="flex items-center justify-center {{#ifCond this.status '==' true}} text-success {{else}} text-danger{{/ifCond}}">
-                                <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> {{#ifCond this.status '==' true}} Active {{else}} Inactive{{/ifCond}}
+                        <td>
+                            {{this.location.address}}
+                        </td>
+                        <td>
+                            $ {{this.price}}/ {{this.priceType}}
+                        </td>
+                        <td>
+                            <a href="/admin/service/edit/{{this.serviceId}}" class="font-medium whitespace-nowrap">{{this.parentVendor}}</a>
+                        </td>
+                        <td>
+                            <a href="/admin/service/edit/{{this.serviceId}}" class="font-medium whitespace-nowrap">{{this.parentCategory}}</a>
+                        </td>
+                        <td class="w-40">
+                            <div class="flex items-center justify-center {{#ifCond this.equipment '==' true}} text-success {{else}} text-danger{{/ifCond}}">
+                                <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> {{#ifCond this.equipment '==' true}} Yes {{else}} No{{/ifCond}}
                             </div>
-                        </td> --}}
+                        </td>
+                        <td>
+                            {{this.cancelPolicy}}
+                        </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
-                                <a class="flex items-center mr-3" href="/admin/category/edit/{{this.id}}">
+                                <a class="flex items-center mr-3" href="/admin/service/edit/{{this.serviceId}}">
                                     <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                                 </a>
-                                <a class="flex items-center text-danger deleteRecord" href="javascript:;" data-tw-toggle="modal" data-id="{{this.id}}" data-tw-target="#delete-confirmation-modal">
+                                <a class="flex items-center text-danger deleteRecord" href="javascript:;" data-tw-toggle="modal" data-id="{{this.serviceId}}" data-tw-target="#delete-confirmation-modal">
                                     <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Delete
                                 </a>
                             </div>
@@ -89,12 +114,12 @@
                 <ul class="pagination">
                     {{#ifCond currentPage '!==' 1}}
                     <li class="page-item">
-                        <a class="page-link" href="/admin/category/index">
+                        <a class="page-link" href="/admin/service/index">
                             <i class="w-4 h-4" data-lucide="chevrons-left"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/admin/category/index?page={{prevPage}}">
+                        <a class="page-link" href="/admin/service/index?page={{prevPage}}">
                             <i class="w-4 h-4" data-lucide="chevron-left"></i>
                         </a>
                     </li>
@@ -102,18 +127,18 @@
 
                     {{#times pages}}
                         <li class="page-item">
-                            <a class="page-link" href="/admin/category/index?page={{this}}">{{this}}</a>
+                            <a class="page-link" href="/admin/service/index?page={{this}}">{{this}}</a>
                         </li>
                     {{/times}}
 
                     {{#ifCond pages '!==' currentPage}}
                     <li class="page-item">
-                        <a class="page-link" href="/admin/category/index?page={{nextPage}}">
+                        <a class="page-link" href="/admin/service/index?page={{nextPage}}">
                             <i class="w-4 h-4" data-lucide="chevron-right"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/admin/category/index?page={{pages}}">
+                        <a class="page-link" href="/admin/service/index?page={{pages}}">
                             <i class="w-4 h-4" data-lucide="chevrons-right"></i>
                         </a>
                     </li>
@@ -135,7 +160,7 @@
     <div id="delete-confirmation-modal" class="modal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-            <form id="delete-form" action="/admin/category/index/delete" method="POST">
+            <form id="delete-form" action="/admin/service/index/delete" method="POST">
                 <div class="modal-body p-0">
                 <div class="p-5 text-center">
                     <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i>
@@ -146,7 +171,7 @@
                     <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
                     <button type="submit" class="btn btn-danger w-24">Delete</button>
                 </div>
-                <input type="hidden" name="categoryId" id="categoryIdInput">
+                <input type="hidden" name="serviceId" id="serviceIdInput">
                 </div>
             </form>
             </div>
@@ -157,13 +182,13 @@
         <!-- END: Content -->
         <script>
             function add() {
-                window.location.href = "/admin/category/add";
+                window.location.href = "/admin/service/add";
             }
 
             document.querySelectorAll('.deleteRecord').forEach((deleteBtn) => {
                 deleteBtn.addEventListener('click', () => {
-                    const categoryId = deleteBtn.dataset.id;
-                    document.getElementById('categoryIdInput').value = categoryId;
+                    const serviceId = deleteBtn.dataset.id;
+                    document.getElementById('serviceIdInput').value = serviceId;
                 });
             });
 

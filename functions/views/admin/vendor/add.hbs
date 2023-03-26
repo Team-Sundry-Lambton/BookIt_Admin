@@ -6,7 +6,7 @@
             </div>
             <div class="grid grid-cols-11 gap-x-6 mt-5 pb-20">
                 <div class="intro-y col-span-11 2xl:col-span-9">
-                    <form id="edit-form" action="/admin/category/edit" method="POST">
+                    <form id="add-form" action="/admin/category/add" method="POST">
                     <!-- BEGIN: Product Information -->
                     <div class="intro-y box p-5 mt-5">
                         <div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
@@ -26,9 +26,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="name" name="name" type="text" class="form-control" placeholder="Name of item" value="{{category.name}}">
-                                        <div class="form-help text-right">Maximum character 0/70</div>
+                                    <div class="w-full mt-3 xl:mt-0 flex-1" id="divName">
+                                        <input id="name" name="name" type="text" class="form-control" placeholder="Name of item">
+                                        <div class="pristine-error text-left text-danger mt-2" id="divNameLabel" style="display:none">This field is required</div>
                                     </div>
                                 </div>
                                 <div class="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
@@ -43,7 +43,7 @@
                                         <select id="category" class="form-select" name="parent_id">
                                             <option value="">--No parent category--</option>
                                             {{#each categories}}
-                                            <option {{#ifCond ../category.parent_id '===' this.id}} selected {{/ifCond}} value="{{this.id}}">{{this.name}}</option>
+                                            <option value="{{this.id}}">{{this.name}}</option>
                                             {{/each}}
                                     </select>
                                     </div>
@@ -73,7 +73,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <textarea id="description" name="description">{{category.description}}</textarea>
+                                        <textarea id="description" name="description"></textarea>
                                         <div class="form-help text-right">Maximum character 0/2000</div>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                                         <div class="w-52 mx-auto xl:mr-0 xl:ml-6">
                                             <div class="border-2 border-dashed shadow-sm border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
                                                 <div class="h-40 relative image-fit cursor-pointer zoom-in mx-auto">
-                                                    <img id="picture" class="rounded-md" alt="" src="{{category.picture}}">
+                                                    <img id="picture" class="rounded-md" alt="" src="">
                                                     <div title="Remove this profile photo?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2">
                                                         <i data-lucide="x" class="w-4 h-4"></i>
                                                     </div>
@@ -143,10 +143,8 @@
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
                                         <div class="form-check form-switch">
-                                            <input id="item-status-active" name="status" class="form-check-input" type="checkbox" {{#if category.status}}checked{{/if}}>
-                                            <label class="form-check-label" for="item-status-active">
-                                                <span id="status-text">{{#if category.status}}Active{{else}}Inactive{{/if}}</span>
-                                            </label>
+                                            <input id="item-status-active" name="status" class="form-check-input" type="checkbox">
+                                            <label class="form-check-label" for="item-status-active"><span id="status-text">Inactive</span></label>
                                         </div>
                                     </div>
                                 </div>
@@ -159,7 +157,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="product-stock" type="text" name="item_order" value="{{category.item_order}}" class="form-control" placeholder="The order of item">
+                                        <input id="product-stock" type="text" name="item_order" class="form-control" value="{{maxItemOrder}}" placeholder="The order of item">
                                     </div>
                                 </div>
                             </div>
@@ -167,10 +165,11 @@
                     </div>
                     <!-- END: Product Management -->
                     <div class="flex justify-end flex-col md:flex-row gap-2 mt-5">
-                        <span id="password-error" style="color: red;"></span>
-                        <input id="id" type="hidden" name="id" value="{{categoryId}}">
                         <button type="button" onclick="cancel()" class="btn py-3 border-slate-300 dark:border-darkmode-400 text-slate-500 w-full md:w-52">Cancel</button>
                         <button type="submit" class="btn py-3 btn-primary w-full md:w-52">Save</button>
+                    </div>
+                    <div class="flex justify-end flex-col md:flex-row gap-2 mt-5">
+                        <span id="password-error" style="color: red;"></span>
                     </div>
                     </form>
                 </div>
@@ -191,8 +190,7 @@
             function cancel() {
                 window.location.href = "/admin/category/index";
             }
-            var editor = CKEDITOR.replace('description');
-            editor.setData(category.description);
+            CKEDITOR.replace('description');
 
             const changePhotoBtn = document.getElementById('change-photo-btn');
             const fileInput = document.getElementById('file');
@@ -209,6 +207,36 @@
                     avatarImg.src = reader.result;
                 };
                 reader.readAsDataURL(file);
+            });
+
+            const add_form = document.getElementById("add-form");
+            const password_error = document.getElementById("password-error");
+            
+            const name = document.getElementById("name");
+            const divName = document.getElementById("divName");
+            const divNameLabel = document.getElementById("divNameLabel");
+
+            // Define a validation function to check the name input
+            function validateName() {
+            if (name.value.trim() === "") {
+                divName.classList.add("has-error");
+                divNameLabel.style.display = "block";
+                return false; 
+            } else {
+                divName.classList.remove("has-error");
+                divNameLabel.style.display = "none";
+                return true;
+            }
+            }
+            name.addEventListener("blur", validateName);
+
+            add_form.addEventListener("submit", function(event) {
+                if (name.value === "") { 
+                    password_error.innerHTML = "Please fill all required fields";
+                    event.preventDefault(); // prevent form submission
+                } else {
+                    password_error.innerHTML = "";
+                }
             });
         </script>
     {{> footer}}

@@ -26,10 +26,14 @@ app.post('/', async (req, res) => {
   const isLoggedIn = await loginData(req);
   if (isLoggedIn) {
     // res.redirect('/admin/dashboard');
-    res.redirect('/admin/category/index');
+    res.redirect('/admin/service/index');
   } else {
     const errorMsg = "Invalid username or password";
-    res.render('login',{errorMsg});
+    res.render('./admin/login',{
+      errorMsg,
+      pageName: "Login",
+      title: global.title
+    });
   }
 });
 

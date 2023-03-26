@@ -50,21 +50,54 @@ const adminProfileRouter = require("./routes/admin/profile");
 const adminChangPasswordRouter = require("./routes/admin/change_password");
 const adminDashboardRouter = require("./routes/admin/dashboard");
 
-const adminCategoryRouter = require("./routes/admin/category/index");
-const adminAddCategoryRouter = require("./routes/admin/category/add");
-const adminEditCategoryRouter = require("./routes/admin/category/edit");
-
 
 app.use("/index", indexRouter);
+app.use("/admin", loginRouter);
 app.use("/admin/login", loginRouter);
 app.use("/admin/register", registerRouter);
 app.use("/admin/profile", adminProfileRouter);
 app.use("/admin/change-password", adminChangPasswordRouter);
 app.use("/admin/dashboard", adminDashboardRouter);
 
+//category page
+const adminCategoryRouter = require("./routes/admin/category/index");
+const adminAddCategoryRouter = require("./routes/admin/category/add");
+const adminEditCategoryRouter = require("./routes/admin/category/edit");
 app.use("/admin/category/index", adminCategoryRouter);
 app.use("/admin/category/add", adminAddCategoryRouter);
 app.use("/admin/category/edit", adminEditCategoryRouter);
+
+//admin page
+const adminAdminRouter = require("./routes/admin/admin/index");
+const adminAddAdminRouter = require("./routes/admin/admin/add");
+const adminEditAdminRouter = require("./routes/admin/admin/edit");
+app.use("/admin/admin/index", adminAdminRouter);
+app.use("/admin/admin/add", adminAddAdminRouter);
+app.use("/admin/admin/edit", adminEditAdminRouter);
+
+//service page
+const adminServiceRouter = require("./routes/admin/service/index");
+const adminAddServiceRouter = require("./routes/admin/service/add");
+const adminEditServiceRouter = require("./routes/admin/service/edit");
+app.use("/admin/service/index", adminServiceRouter);
+app.use("/admin/service/add", adminAddServiceRouter);
+app.use("/admin/service/edit", adminEditServiceRouter);
+
+//vendor page
+const adminVendorRouter = require("./routes/admin/vendor/index");
+const adminAddVendorRouter = require("./routes/admin/vendor/add");
+const adminEditVendorRouter = require("./routes/admin/vendor/edit");
+app.use("/admin/vendor/index", adminVendorRouter);
+app.use("/admin/vendor/add", adminAddVendorRouter);
+app.use("/admin/vendor/edit", adminEditVendorRouter);
+
+//client page
+const adminClientRouter = require("./routes/admin/client/index");
+const adminAddClientRouter = require("./routes/admin/client/add");
+const adminEditClientRouter = require("./routes/admin/client/edit");
+app.use("/admin/client/index", adminClientRouter);
+app.use("/admin/client/add", adminAddClientRouter);
+app.use("/admin/client/edit", adminEditClientRouter);
 
 
 // add breadcrumbs

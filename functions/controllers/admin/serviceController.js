@@ -4,69 +4,77 @@ const rootFolder = process.cwd();
 const config = require(path.join(rootFolder, "/config/db"));;
 const admin = require('firebase-admin');
 
-const categoriesCollection = admin.firestore().collection('categories');
+const dbCollection = admin.firestore().collection('service');
+const mediaCollection = admin.firestore().collection('media');
+const addressCollection = admin.firestore().collection('address');
 
 
-async function getListCategories() {
-  try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'asc').get();
-    const categories = [];
-    for (const doc of querySnapshot.docs) {
-      const data = doc.data();
-      const parentId = data.parent_id;
-      let parentData = null;
-      if (parentId != "") {
-        const parentDoc = await categoriesCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      }
-      categories.push({
-        id: doc.id,
-        ...data,
-        parent_cat: parentData,
-      });
-    }
-    return categories;
-  } catch (err) {
-    console.log('Error getting documents', err);
-    throw err;
-  }
-}
-async function getAllCategories(limit, page) {
+
+async function getAllServices(limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = categoriesCollection.orderBy('name', 'asc');
+    let query = dbCollection.orderBy('serviceId', 'asc');
     
     if (startAfter) {
       query = query.startAfter(startAfter);
     }
 
     const querySnapshot = await query.limit(limit).get();
-    const categories = [];
+    const results = [];
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      //const parentId = data.parent_id;
-      let parentData = null;
+      const serviceId = data.serviceId;
+      let medias = null;
+      let location = null;
 
-      /* if (parentId != "") {
-        const parentDoc = await categoriesCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      } */
+      try {
+        const queryMediaSnapshot = await mediaCollection.where('parentService', '==', serviceId).get();
+        if (!queryMediaSnapshot.empty) {
+          const mediasDoc = queryMediaSnapshot.docs;
+          medias = [];
+          mediasDoc.forEach(doc => {
+            medias.push(doc.data());
+          });
+          console.log(medias);
+        } else {
+          medias = null;
+        }
 
-      categories.push({
+      } catch (error) {
+        console.error(error);
+        medias = null;
+      }
+      
+      try {
+        const queryLocationSnapshot = await addressCollection.where('parentService', '==', serviceId).get();
+        if (!queryLocationSnapshot.empty) {
+          const locationDoc = queryLocationSnapshot.docs[0];
+          location = locationDoc.data();
+        } else {
+          location = null;
+        }
+      } catch (error) {
+        console.error(error);
+        location = null;
+      }
+      
+
+      results.push({
         id: doc.id,
         ...data,
-        //parent_cat: parentData,
+        medias: medias,
+        location: location
       });
     }
 
-    const totalCategories = await categoriesCollection.get();
-    const totalCount = totalCategories.docs.length;
+    const totalResult = await dbCollection.get();
+    const totalCount = totalResult.docs.length;
 
     return {
-      categories,
-      next: querySnapshot.docs.length === limit ? querySnapshot.docs[limit - 1].id : null,
-      totalCount,
+        results,
+        next: querySnapshot.docs.length === limit ? querySnapshot.docs[limit - 1].id : null,
+        totalCount,
     };
   } catch (err) {
     console.log('Error getting documents', err);
@@ -74,12 +82,22 @@ async function getAllCategories(limit, page) {
   }
 }
 
+const deleteService = async (req, res, next) => {
+  try {
+    const id = req.body.categoryId;
+    console.log("Deleting category= %s", id);
+    const deleteResult = categoriesCollection.doc(id).delete()
+      .then(function() {
+        console.log("Document successfully deleted!");
+        res.redirect('/admin/category/index');
+      })
+      .catch(function(error) {console.error("Error deleting document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
-
-
-
-
-const addCategory = async (req, res, next) => {
+const addService = async (req, res, next) => {
   try {
     console.log("Adding new Category");
     const data = req.body;
@@ -107,22 +125,9 @@ const addCategory = async (req, res, next) => {
   }
 };
 
-const deleteCategory = async (req, res, next) => {
-  try {
-    const id = req.body.categoryId;
-    console.log("Deleting category= %s", id);
-    const deleteResult = categoriesCollection.doc(id).delete()
-      .then(function() {
-        console.log("Document successfully deleted!");
-        res.redirect('/admin/category/index');
-      })
-      .catch(function(error) {console.error("Error deleting document: ", error);});
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
 
-const getCategory = async (id) => {
+
+const getService = async (id) => {
   try {
     console.log("Getting category= %s", id);
     const data = await categoriesCollection.doc(id).get();
@@ -138,7 +143,7 @@ const getCategory = async (id) => {
 };
 
 
-const updateCategory = async (req, res, next) => {
+const updateService = async (req, res, next) => {
   console.log('updating cat');
   const id = req.params.id;
   const data = req.body;
@@ -180,11 +185,10 @@ async function getMaxItemOrderOfCategories() {
 }
 
 module.exports = {
-  addCategory,
-  getAllCategories,
-  getCategory,
-  updateCategory,
-  deleteCategory,
-  getListCategories,
-  getMaxItemOrderOfCategories
+  addService,
+  getAllServices,
+  getService,
+  updateService,
+  deleteService,
+  //getMaxItemOrderOfCategories
 };

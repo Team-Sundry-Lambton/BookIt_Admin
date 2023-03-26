@@ -4,44 +4,38 @@ const rootFolder = process.cwd();
 const config = require(path.join(rootFolder, "/config/db"));;
 const admin = require('firebase-admin');
 
-const categoriesCollection = admin.firestore().collection('categories');
+const dbCollection = admin.firestore().collection('client');
 
 
-async function getListCategories() {
+async function getListClients() {
   try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'asc').get();
-    const categories = [];
+    const querySnapshot = await dbCollection.orderBy('firstName', 'asc').get();
+    const results = [];
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      const parentId = data.parent_id;
       let parentData = null;
-      if (parentId != "") {
-        const parentDoc = await categoriesCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      }
-      categories.push({
+      dataResult.push({
         id: doc.id,
         ...data,
-        parent_cat: parentData,
       });
     }
-    return categories;
+    return results;
   } catch (err) {
     console.log('Error getting documents', err);
     throw err;
   }
 }
-async function getAllCategories(limit, page) {
+async function getAllClients(limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = categoriesCollection.orderBy('name', 'asc');
+    let query = dbCollection.orderBy('firstName', 'asc');
     
     if (startAfter) {
       query = query.startAfter(startAfter);
     }
 
     const querySnapshot = await query.limit(limit).get();
-    const categories = [];
+    const results = [];
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
@@ -53,20 +47,20 @@ async function getAllCategories(limit, page) {
         parentData = parentDoc.data();
       } */
 
-      categories.push({
+      results.push({
         id: doc.id,
         ...data,
         //parent_cat: parentData,
       });
     }
 
-    const totalCategories = await categoriesCollection.get();
-    const totalCount = totalCategories.docs.length;
+    const totalResult = await dbCollection.get();
+    const totalCount = totalResult.docs.length;
 
     return {
-      categories,
-      next: querySnapshot.docs.length === limit ? querySnapshot.docs[limit - 1].id : null,
-      totalCount,
+        results,
+        next: querySnapshot.docs.length === limit ? querySnapshot.docs[limit - 1].id : null,
+        totalCount,
     };
   } catch (err) {
     console.log('Error getting documents', err);
@@ -79,7 +73,7 @@ async function getAllCategories(limit, page) {
 
 
 
-const addCategory = async (req, res, next) => {
+const addService = async (req, res, next) => {
   try {
     console.log("Adding new Category");
     const data = req.body;
@@ -107,7 +101,7 @@ const addCategory = async (req, res, next) => {
   }
 };
 
-const deleteCategory = async (req, res, next) => {
+const deleteClient = async (req, res, next) => {
   try {
     const id = req.body.categoryId;
     console.log("Deleting category= %s", id);
@@ -122,7 +116,7 @@ const deleteCategory = async (req, res, next) => {
   }
 };
 
-const getCategory = async (id) => {
+const getService = async (id) => {
   try {
     console.log("Getting category= %s", id);
     const data = await categoriesCollection.doc(id).get();
@@ -138,7 +132,7 @@ const getCategory = async (id) => {
 };
 
 
-const updateCategory = async (req, res, next) => {
+const updateService = async (req, res, next) => {
   console.log('updating cat');
   const id = req.params.id;
   const data = req.body;
@@ -180,11 +174,11 @@ async function getMaxItemOrderOfCategories() {
 }
 
 module.exports = {
-  addCategory,
-  getAllCategories,
-  getCategory,
-  updateCategory,
-  deleteCategory,
-  getListCategories,
-  getMaxItemOrderOfCategories
+  addService,
+  getAllClients,
+  getService,
+  updateService,
+  deleteClient,
+  getListClients,
+  //getMaxItemOrderOfCategories
 };

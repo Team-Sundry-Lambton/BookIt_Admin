@@ -1,8 +1,4 @@
 
-<!DOCTYPE html>
-<html>
-<head></head>
-<body>
     {{> header}}
 <!-- BEGIN: Content -->
         <div class="content">
@@ -57,7 +53,7 @@
                                         <i data-lucide="x" class="w-4 h-4"></i>
                                     </div>
                                 </div>
-                                <form id="change-photo-form">
+                                <form id="change-photo-form" action="/admin/profile/change-photo" method="POST" enctype="multipart/form-data">
                                 <div class="mx-auto cursor-pointer relative mt-5">
                                     <button id="change-photo-btn" type="button" class="btn btn-primary w-full">Change Photo</button>
                                     <input id="file" name="avatar" type="file" class="w-full h-full top-0 left-0 absolute opacity-0">
@@ -73,7 +69,6 @@
     </div>
         </div>
         <!-- END: Content -->
-        {{> footer}}
         <script>
 
             const update_profile_form = document.getElementById("update-profile-form");
@@ -111,6 +106,7 @@
                 document.getElementById('submitBtn').style.display = 'block';
             });
 
+/*
             const form = document.getElementById("change-photo-form");
             form.addEventListener("submit", submitForm);
             function submitForm(e) {
@@ -118,7 +114,6 @@
                 const files = document.getElementById("file");
                 const formData = new FormData();
                 console.log(files.files[0]);
-                formData.append("name", "Ethan");
                 formData.append("avatar", files.files[0]);
                 fetch("/admin/profile/change-photo", {
                     method: 'POST',
@@ -131,6 +126,5 @@
                     .catch((err) => ("Error occured", err));
             }
         </script>
-</body>
-</html> 
+        {{> footer}}
       

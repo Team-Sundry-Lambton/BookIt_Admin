@@ -1,6 +1,5 @@
 const express = require('express')
 let app = express.Router()
-const admin = require('firebase-admin');
 const session = require('express-session');
 app.use(session({
   secret: 'yourSecretKey',
@@ -11,6 +10,14 @@ app.use(session({
     maxAge: 3600000 // Set the session to expire in 1 hour
   } 
 }));
+const path = require('path');
+const rootFolder = process.cwd();
+const {
+    getCategory,
+    updateCategory,
+    getListCategories
+} = require(path.join(rootFolder, "/controllers/admin/categoryController"));
+
 
 // Middleware to check if the user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -26,17 +33,25 @@ app.use(function(req, res, next) {
   next();
 });
   
-  app.get('/', isLoggedIn, async (req,res) =>{
+app.get('/:id', isLoggedIn, async (req,res) =>{
     var adminUser = req.session.user;
     var currentUrl = req.originalUrl;
-    res.render('./admin/dashboard',{
-      adminUser, 
-      currentUrl, 
-      pageName: "Dashboard",
-      title: global.title,
-      breadcrumbs: req.breadcrumbs
+    const id = req.params.id;
+    var category = await getCategory(id);
+    var categories = await getListCategories();
+    console.log(category);
+    res.render('./admin/category/edit',{
+        adminUser, 
+        currentUrl, 
+        pageName: "Edit Category",
+        title: global.title,
+        breadcrumbs: req.breadcrumbs,
+        categoryId: id,
+        category,
+        categories
     });
-  });
-  
+});
+
+app.post('/', isLoggedIn, updateCategory);
 
 module.exports = app

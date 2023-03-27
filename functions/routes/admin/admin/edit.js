@@ -1,6 +1,5 @@
 const express = require('express')
 let app = express.Router()
-const admin = require('firebase-admin');
 const session = require('express-session');
 app.use(session({
   secret: 'yourSecretKey',
@@ -11,6 +10,13 @@ app.use(session({
     maxAge: 3600000 // Set the session to expire in 1 hour
   } 
 }));
+const path = require('path');
+const rootFolder = process.cwd();
+const {
+    getAdmin,
+    updateAdmin
+} = require(path.join(rootFolder, "/controllers/admin/adminController"));
+
 
 // Middleware to check if the user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -26,17 +32,23 @@ app.use(function(req, res, next) {
   next();
 });
   
-  app.get('/', isLoggedIn, async (req,res) =>{
+app.get('/:id', isLoggedIn, async (req,res) =>{
     var adminUser = req.session.user;
     var currentUrl = req.originalUrl;
-    res.render('./admin/dashboard',{
-      adminUser, 
-      currentUrl, 
-      pageName: "Dashboard",
-      title: global.title,
-      breadcrumbs: req.breadcrumbs
+    const id = req.params.id;
+    var admin = await getAdmin(id);
+    console.log(admin);
+    res.render('./admin/admin/edit',{
+        adminUser, 
+        currentUrl, 
+        pageName: "Edit Category",
+        title: global.title,
+        breadcrumbs: req.breadcrumbs,
+        adminId: id,
+        admin
     });
-  });
-  
+});
+
+app.post('/', isLoggedIn, updateAdmin);
 
 module.exports = app

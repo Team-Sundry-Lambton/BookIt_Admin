@@ -242,3 +242,31 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
           return options.inverse(this);
   }
 });
+
+const moment = require('moment');
+Handlebars.registerHelper('formatDate', function(date) {
+  return moment(date).format('MMMM Do YYYY, h:mm:ss a');
+});
+
+Handlebars.registerHelper('times', function(n, block) {
+  var accum = '';
+  for(var i = 1; i <= n; ++i)
+      accum += block.fn(i);
+  return accum;
+});
+
+Handlebars.registerHelper('ifCond2', function(v1, v2, options) {
+  if (v1 === v2) {
+    return options.fn(this);
+  }
+  return options.inverse(this);
+});
+
+
+Handlebars.registerHelper('ifUrlIncludes', function(v1, v2, options) {
+  if (v1.includes(v2)) {
+    return options.fn(this);
+  } else {
+    return options.inverse(this);
+  }
+});

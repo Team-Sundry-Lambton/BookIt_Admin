@@ -1,6 +1,5 @@
 const express = require('express')
 let app = express.Router()
-const admin = require('firebase-admin');
 const session = require('express-session');
 app.use(session({
   secret: 'yourSecretKey',
@@ -11,6 +10,14 @@ app.use(session({
     maxAge: 3600000 // Set the session to expire in 1 hour
   } 
 }));
+const path = require('path');
+const rootFolder = process.cwd();
+const {
+  addCategory,
+  getListCategories,
+  getMaxItemOrderOfCategories
+} = require(path.join(rootFolder, "/controllers/admin/categoryController"));
+
 
 // Middleware to check if the user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -26,17 +33,22 @@ app.use(function(req, res, next) {
   next();
 });
   
-  app.get('/', isLoggedIn, async (req,res) =>{
-    var adminUser = req.session.user;
-    var currentUrl = req.originalUrl;
-    res.render('./admin/dashboard',{
+app.get('/', isLoggedIn, async (req,res) =>{
+  var adminUser = req.session.user;
+  var currentUrl = req.originalUrl;
+  var categories = await getListCategories();
+  var maxItemOrder = await getMaxItemOrderOfCategories();
+  res.render('./admin/category/add',{
       adminUser, 
       currentUrl, 
-      pageName: "Dashboard",
+      pageName: "Add Category",
       title: global.title,
-      breadcrumbs: req.breadcrumbs
-    });
+      breadcrumbs: req.breadcrumbs,
+      categories,
+      maxItemOrder: maxItemOrder + 1
   });
-  
+});
+
+app.post('/', isLoggedIn, addCategory);
 
 module.exports = app

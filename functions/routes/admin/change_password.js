@@ -57,10 +57,8 @@ const isLoggedIn = (req, res, next) => {
               const docRef = doc.ref;
               const hashedNewPassword = await bcrypt.hash(new_password, 8); 
               await docRef.update({ password: hashedNewPassword });
-              return res.send('Password updated successfully');
-            } else {
-              return res.send('Invalid password');
             }
+            res.redirect('/admin/profile');
           } else {
           return res.send('User not found');
         }

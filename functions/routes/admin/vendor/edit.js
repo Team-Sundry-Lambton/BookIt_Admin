@@ -13,10 +13,9 @@ app.use(session({
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-    getCategory,
-    updateCategory,
-    getListCategories
-} = require(path.join(rootFolder, "/controllers/admin/categoryController"));
+    getVendor,
+    updateVendor
+} = require(path.join(rootFolder, "/controllers/admin/vendorController"));
 
 
 // Middleware to check if the user is logged in
@@ -37,21 +36,19 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
     var adminUser = req.session.user;
     var currentUrl = req.originalUrl;
     const id = req.params.id;
-    var category = await getCategory(id);
-    var categories = await getListCategories();
-    console.log(category);
-    res.render('./admin/category/edit',{
+    var data = await getVendor(id);
+    res.render('./admin/vendor/edit',{
         adminUser, 
         currentUrl, 
-        pageName: "Edit Category",
+        pageName: "Edit Vendor",
         title: global.title,
         breadcrumbs: req.breadcrumbs,
-        categoryId: id,
-        category,
-        categories
+        vendorId: id,
+        vendor: data.vendor,
+        account: data.account
     });
 });
 
-app.post('/', isLoggedIn, updateCategory);
+app.post('/', isLoggedIn, updateVendor);
 
 module.exports = app

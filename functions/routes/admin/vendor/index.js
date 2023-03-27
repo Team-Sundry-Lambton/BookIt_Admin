@@ -13,10 +13,7 @@ app.use(session({
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-  // addCategory,
   getAllVendors,
-  // getCategory,
-  // updateCategory,
   deleteVendor
 } = require(path.join(rootFolder, "/controllers/admin/vendorController"));
 

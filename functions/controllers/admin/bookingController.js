@@ -4,14 +4,15 @@ const rootFolder = process.cwd();
 const config = require(path.join(rootFolder, "/config/db"));;
 const admin = require('firebase-admin');
 
-const dbCollection = admin.firestore().collection('service');
-const mediaCollection = admin.firestore().collection('media');
-const addressCollection = admin.firestore().collection('address');
+const dbCollection = admin.firestore().collection('booking');
+const vendorCollection = admin.firestore().collection('vendor');
+const clientCollection = admin.firestore().collection('client');
+const serviceCollection = admin.firestore().collection('service');
 
-async function getAllServices(searchByVendor, searchByCategory, limit, page) {
+async function getAllBookings(searchByVendor, searchByCategory, limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('serviceId', 'asc');
+    let query = dbCollection.orderBy('date', 'asc');
 
     if (searchByVendor && !searchByCategory) {
       query = dbCollection.where('parentVendor', '==', searchByVendor);
@@ -26,46 +27,64 @@ async function getAllServices(searchByVendor, searchByCategory, limit, page) {
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      const serviceId = data.serviceId;
-      let medias = null;
-      let location = null;
+      let vendor = null;
+      let client = null;
+      let service = null;
 
       try {
-        const queryMediaSnapshot = await mediaCollection.where('parentService', '==', serviceId).get();
-        if (!queryMediaSnapshot.empty) {
-          const mediasDoc = queryMediaSnapshot.docs;
-          medias = [];
-          mediasDoc.forEach(doc => {
-            medias.push(doc.data());
-          });
+        const queryServiceSnapshot = await serviceCollection.where('serviceId', '==', data.parentService).get();
+        if (!queryServiceSnapshot.empty) {
+          const serviceDoc = queryServiceSnapshot.docs[0];
+          service = serviceDoc.data();
         } else {
-          medias = null;
-        }
-
-      } catch (error) {
-        console.error(error);
-        medias = null;
-      }
-      
-      try {
-        const queryLocationSnapshot = await addressCollection.where('parentService', '==', serviceId).get();
-        if (!queryLocationSnapshot.empty) {
-          const locationDoc = queryLocationSnapshot.docs[0];
-          location = locationDoc.data();
-        } else {
-          location = null;
+          service = null;
         }
       } catch (error) {
         console.error(error);
-        location = null;
+        service = null;
+      }
+
+      try {
+        const queryVendorSnapshot = await vendorCollection.where('email', '==', data.vendorEmailAddress).get();
+        if (!queryVendorSnapshot.empty) {
+          const vendorDoc = queryVendorSnapshot.docs[0];
+          vendor = vendorDoc.data();
+        } else {
+          vendor = null;
+        }
+      } catch (error) {
+        console.error(error);
+        vendor = null;
+      }
+
+      try {
+        const queryClientSnapshot = await clientCollection.where('email', '==', data.clientEmailAddress).get();
+        if (!queryClientSnapshot.empty) {
+          const clientDoc = queryClientSnapshot.docs[0];
+          client = clientDoc.data();
+        } else {
+          client = null;
+        }
+      } catch (error) {
+        console.error(error);
+        client = null;
       }
       
+
+      //const bookingDate = new Date(data.date);
+      //data.date = `${bookingDate.getFullYear()}-${(bookingDate.getMonth() + 1).toString().padStart(2, '0')}-${bookingDate.getDate().toString().padStart(2, '0')}`;
+
+      const timestamp = data.date;
+      const milliseconds = timestamp / 1000; 
+      const date = new Date(milliseconds); 
+      data.date = date.toISOString(); 
 
       results.push({
         id: doc.id,
         ...data,
-        medias: medias,
-        location: location
+        vendor: vendor,
+        client: client,
+        service: service
       });
     }
 
@@ -84,7 +103,7 @@ async function getAllServices(searchByVendor, searchByCategory, limit, page) {
 }
 
 
-const getService = async (id) => {
+const getBooking = async (id) => {
   try {
     console.log("Getting serviceId= %s", id);
     const data = await dbCollection.doc(id).get();
@@ -100,7 +119,7 @@ const getService = async (id) => {
 };
 
 
-const updateService = async (req, res, next) => {
+const updateBooking = async (req, res, next) => {
   console.log('updating cat');
   const id = req.params.id;
   const data = req.body;
@@ -128,42 +147,14 @@ const updateService = async (req, res, next) => {
   }
 };
 
-const addService = async (req, res, next) => {
+const deleteBooking = async (req, res, next) => {
   try {
-    console.log("Adding new Category");
-    const data = req.body;
-    data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
-    data.status = data.status == "on" ? true : false;
-    data.created_date = Math.floor(Date.now() / 1000);
-    data.modified_date = Math.floor(Date.now() / 1000);
-    const writeResult = await categoriesCollection.add({
-      name: data.name,
-      picture: data.picture,
-      description: data.description,
-      item_order: parseInt(data.item_order),
-      status: data.status,
-      parent_id: data.parent_id,
-      created_date: data.created_date,
-      modified_date: data.modified_date
-    })
-    .then(function() {
-      console.log("Document successfully written!");
-      res.redirect('/admin/category/index');
-    })
-    .catch(function(error) {console.error("Error writing document: ", error);});
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const deleteService = async (req, res, next) => {
-  try {
-    const id = req.body.categoryId;
+    const id = req.body.adminId;
     console.log("Deleting category= %s", id);
-    const deleteResult = categoriesCollection.doc(id).delete()
+    const deleteResult = dbCollection.doc(id).delete()
       .then(function() {
         console.log("Document successfully deleted!");
-        res.redirect('/admin/category/index');
+        res.redirect('/admin/booking/index');
       })
       .catch(function(error) {console.error("Error deleting document: ", error);});
   } catch (error) {
@@ -172,24 +163,9 @@ const deleteService = async (req, res, next) => {
 };
 
 
-async function getMaxItemOrderOfCategories() {
-  try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'desc').limit(1).get();
-    const maxOrderDoc = querySnapshot.docs[0];
-    const maxItemOrder = maxOrderDoc.data().item_order;
-    
-    return maxItemOrder;
-  } catch (err) {
-    console.log('Error getting documents', err);
-    throw err;
-  }
-}
-
 module.exports = {
-  addService,
-  getAllServices,
-  getService,
-  updateService,
-  deleteService,
-  //getMaxItemOrderOfCategories
+  getAllBookings,
+  getBooking,
+  updateBooking,
+  deleteBooking
 };

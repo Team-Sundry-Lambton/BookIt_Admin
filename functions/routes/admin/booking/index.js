@@ -13,11 +13,16 @@ app.use(session({
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-  // addCategory,
-  getAllCategories,
-  // getCategory,
-  // updateCategory,
-  deleteCategory
+  getAllBookings,
+  deleteBooking
+} = require(path.join(rootFolder, "/controllers/admin/bookingController"));
+
+const {
+  getListVendors
+} = require(path.join(rootFolder, "/controllers/admin/vendorController"));
+
+const {
+  getListCategories
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
@@ -38,16 +43,36 @@ app.use(function(req, res, next) {
 app.get('/',isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
+
+  var searchByVendor = req.query.vendor || "";
+  if(searchByVendor == "all"){
+    searchByVendor = "";
+  }
+
+  var searchByCategory = req.query.category || "";
+  if(searchByCategory == "all"){
+    searchByCategory = "";
+  }
+  
+  console.log("searchByVendor: ", searchByVendor);
+  console.log("searchByCategory: ", searchByCategory);
+
   var page = parseInt(req.query.page) || 1;
   var limit = parseInt(req.query.limit) || global.perPage;
-  const data = await getAllCategories(limit,page);
-
-  res.render('./admin/category/index',{
+  const data = await getAllBookings(searchByVendor, searchByCategory, limit, page);
+  const vendors = await getListVendors();
+  const categories = await getListCategories();
+  
+  res.render('./admin/booking/index',{
       adminUser, 
       currentUrl, 
-      pageName: "Category",
+      pageName: "Booking",
       title: global.title,
       breadcrumbs: req.breadcrumbs,
+      searchByVendor: searchByVendor,
+      searchByCategory: searchByCategory,
+      vendors: vendors,
+      categories: categories,
       data: data.results,
       total: data.totalCount,
       next: data.next,
@@ -58,7 +83,7 @@ app.get('/',isLoggedIn, async (req,res) =>{
   });
 });
 
-app.post('/delete', isLoggedIn, deleteCategory);
+app.post('/delete', isLoggedIn, deleteBooking);
 
   
 

@@ -39,18 +39,10 @@ async function getAllClients(limit, page) {
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      //const parentId = data.parent_id;
       let parentData = null;
-
-      /* if (parentId != "") {
-        const parentDoc = await categoriesCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      } */
-
       results.push({
         id: doc.id,
         ...data,
-        //parent_cat: parentData,
       });
     }
 
@@ -68,12 +60,26 @@ async function getAllClients(limit, page) {
   }
 }
 
+const getClient = async (id) => {
+  try {
+    console.log("Getting client= %s", id);
+    const data = await dbCollection.doc(id).get();
+    const client = data.data();
+    if (!client.exists) {
+      return client;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 
 
 
 
-const addService = async (req, res, next) => {
+const addClient = async (req, res, next) => {
   try {
     console.log("Adding new Category");
     const data = req.body;
@@ -116,23 +122,9 @@ const deleteClient = async (req, res, next) => {
   }
 };
 
-const getService = async (id) => {
-  try {
-    console.log("Getting category= %s", id);
-    const data = await categoriesCollection.doc(id).get();
-    const category = data.data();
-    if (!category.exists) {
-      return category;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
 
 
-const updateService = async (req, res, next) => {
+const updateClient = async (req, res, next) => {
   console.log('updating cat');
   const id = req.params.id;
   const data = req.body;
@@ -160,25 +152,11 @@ const updateService = async (req, res, next) => {
   }
 };
 
-async function getMaxItemOrderOfCategories() {
-  try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'desc').limit(1).get();
-    const maxOrderDoc = querySnapshot.docs[0];
-    const maxItemOrder = maxOrderDoc.data().item_order;
-    
-    return maxItemOrder;
-  } catch (err) {
-    console.log('Error getting documents', err);
-    throw err;
-  }
-}
-
 module.exports = {
-  addService,
+  addClient,
   getAllClients,
-  getService,
-  updateService,
+  getClient,
+  updateClient,
   deleteClient,
-  getListClients,
-  //getMaxItemOrderOfCategories
+  getListClients
 };

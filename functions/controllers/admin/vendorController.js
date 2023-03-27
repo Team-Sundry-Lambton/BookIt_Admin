@@ -5,6 +5,7 @@ const config = require(path.join(rootFolder, "/config/db"));;
 const admin = require('firebase-admin');
 
 const dbCollection = admin.firestore().collection('vendor');
+const accountCollection = admin.firestore().collection('account');
 
 
 async function getListVendors() {
@@ -13,8 +14,7 @@ async function getListVendors() {
     const results = [];
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      let parentData = null;
-      dataResult.push({
+      results.push({
         id: doc.id,
         ...data,
       });
@@ -39,18 +39,25 @@ async function getAllVendors(limit, page) {
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      //const parentId = data.parent_id;
-      let parentData = null;
+      let account = null;
 
-      /* if (parentId != "") {
-        const parentDoc = await categoriesCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      } */
+      try {
+        const queryAccountSnapshot = await accountCollection.where('vendorEmailAddress', '==', data.email).get();
+        if (!queryAccountSnapshot.empty) {
+          const accountDoc = queryAccountSnapshot.docs[0];
+          account = accountDoc.data();
+        } else {
+          account = null;
+        }
+      } catch (error) {
+        console.error(error);
+        account = null;
+      }
 
       results.push({
         id: doc.id,
         ...data,
-        //parent_cat: parentData,
+        account: account,
       });
     }
 
@@ -68,12 +75,42 @@ async function getAllVendors(limit, page) {
   }
 }
 
+const getVendor = async (id) => {
+  try {
+    console.log("Getting vendor= %s", id);
+    const data = await dbCollection.doc(id).get();
+    const vendor = data.data();
+
+    let account = null;
+    try {
+      const queryAccountSnapshot = await accountCollection.where('vendorEmailAddress', '==', vendor.email).get();
+      if (!queryAccountSnapshot.empty) {
+        const accountDoc = queryAccountSnapshot.docs[0];
+        account = accountDoc.data();
+      } else {
+        account = null;
+      }
+    } catch (error) {
+      console.error(error);
+      account = null;
+    }
+
+    
+    if (!vendor.exists) {
+      return {
+        vendor,
+        account
+      };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 
-
-
-
-const addService = async (req, res, next) => {
+const addVendor = async (req, res, next) => {
   try {
     console.log("Adding new Category");
     const data = req.body;
@@ -116,23 +153,10 @@ const deleteVendor = async (req, res, next) => {
   }
 };
 
-const getService = async (id) => {
-  try {
-    console.log("Getting category= %s", id);
-    const data = await categoriesCollection.doc(id).get();
-    const category = data.data();
-    if (!category.exists) {
-      return category;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
 
 
-const updateService = async (req, res, next) => {
+
+const updateVendor = async (req, res, next) => {
   console.log('updating cat');
   const id = req.params.id;
   const data = req.body;
@@ -160,25 +184,11 @@ const updateService = async (req, res, next) => {
   }
 };
 
-async function getMaxItemOrderOfCategories() {
-  try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'desc').limit(1).get();
-    const maxOrderDoc = querySnapshot.docs[0];
-    const maxItemOrder = maxOrderDoc.data().item_order;
-    
-    return maxItemOrder;
-  } catch (err) {
-    console.log('Error getting documents', err);
-    throw err;
-  }
-}
-
 module.exports = {
-  addService,
+  addVendor,
   getAllVendors,
-  getService,
-  updateService,
+  getVendor,
+  updateVendor,
   deleteVendor,
-  getListVendors,
-  //getMaxItemOrderOfCategories
+  getListVendors
 };

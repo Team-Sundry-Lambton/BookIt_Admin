@@ -9,14 +9,14 @@
         <div class="side-menu__title"> Dashboard </div>
       </a>
     </li>
-    <li>
+    {{!-- <li>
       <a href="/" class="side-menu">
         <div class="side-menu__icon">
           <i data-lucide="activity"></i>
         </div>
         <div class="side-menu__title"> Statictis </div>
       </a>
-    </li>
+    </li> --}}
     <li class="side-nav__devider my-6"></li>
     <li>
       <a href="/admin/category/index" class="side-menu {{#ifUrlIncludes currentUrl "/admin/category"}} side-menu--active {{/ifUrlIncludes}}">
@@ -50,6 +50,15 @@
         <div class="side-menu__title"> Clients </div>
       </a>
     </li>
+    <li>
+      <a href="/admin/booking/index" class="side-menu {{#ifUrlIncludes currentUrl "/admin/booking"}} side-menu--active {{/ifUrlIncludes}}">
+        <div class="side-menu__icon">
+          <i data-lucide="shopping-cart"></i>
+        </div>
+        <div class="side-menu__title"> Booking </div>
+      </a>
+    </li>
+    
 
     <li class="side-nav__devider my-6"></li>
     

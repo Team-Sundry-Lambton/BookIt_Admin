@@ -13,7 +13,7 @@ hbs.registerHelper('xif', xifHelper);
 global.title = "BookIt";
 app.set('views','./views');
 app.set('view engine', 'hbs');
-global.perPage = 8;
+global.perPage = 30;
 
 // Serve static files from the public directory
 app.use(express.static('public'));
@@ -98,6 +98,14 @@ const adminEditClientRouter = require("./routes/admin/client/edit");
 app.use("/admin/client/index", adminClientRouter);
 app.use("/admin/client/add", adminAddClientRouter);
 app.use("/admin/client/edit", adminEditClientRouter);
+
+//booking page
+const adminBookingRouter = require("./routes/admin/booking/index");
+const adminAddBookingRouter = require("./routes/admin/booking/add");
+const adminEditBookingRouter = require("./routes/admin/booking/edit");
+app.use("/admin/booking/index", adminBookingRouter);
+app.use("/admin/booking/add", adminAddBookingRouter);
+app.use("/admin/booking/edit", adminEditBookingRouter);
 
 
 // add breadcrumbs

@@ -39,18 +39,11 @@ async function getAllAdmins(limit, page) {
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      //const parentId = data.parent_id;
       let parentData = null;
-
-      /* if (parentId != "") {
-        const parentDoc = await categoriesCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      } */
 
       results.push({
         id: doc.id,
-        ...data,
-        //parent_cat: parentData,
+        ...data
       });
     }
 
@@ -68,20 +61,30 @@ async function getAllAdmins(limit, page) {
   }
 }
 
-
-
-
-
-
-const addService = async (req, res, next) => {
+const deleteAdmin = async (req, res, next) => {
   try {
-    console.log("Adding new Category");
+    const id = req.body.adminId;
+    console.log("Deleting admin= %s", id);
+    const deleteResult = dbCollection.doc(id).delete()
+      .then(function() {
+        console.log("Document successfully deleted!");
+        res.redirect('/admin/admin/index');
+      })
+      .catch(function(error) {console.error("Error deleting document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const addAdmin = async (req, res, next) => {
+  try {
+    console.log("Adding new admin");
     const data = req.body;
     data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
     data.status = data.status == "on" ? true : false;
     data.created_date = Math.floor(Date.now() / 1000);
     data.modified_date = Math.floor(Date.now() / 1000);
-    const writeResult = await categoriesCollection.add({
+    const writeResult = await dbCollection.add({
       name: data.name,
       picture: data.picture,
       description: data.description,
@@ -101,28 +104,15 @@ const addService = async (req, res, next) => {
   }
 };
 
-const deleteAdmin = async (req, res, next) => {
-  try {
-    const id = req.body.categoryId;
-    console.log("Deleting category= %s", id);
-    const deleteResult = categoriesCollection.doc(id).delete()
-      .then(function() {
-        console.log("Document successfully deleted!");
-        res.redirect('/admin/category/index');
-      })
-      .catch(function(error) {console.error("Error deleting document: ", error);});
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
 
-const getService = async (id) => {
+
+const getAdmin = async (id) => {
   try {
     console.log("Getting category= %s", id);
-    const data = await categoriesCollection.doc(id).get();
-    const category = data.data();
-    if (!category.exists) {
-      return category;
+    const data = await dbCollection.doc(id).get();
+    const admin = data.data();
+    if (!admin.exists) {
+      return admin;
     } else {
       return null;
     }
@@ -132,27 +122,19 @@ const getService = async (id) => {
 };
 
 
-const updateService = async (req, res, next) => {
-  console.log('updating cat');
-  const id = req.params.id;
-  const data = req.body;
-  data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
-  data.status = data.status == "on" ? true : false;
-  data.modified_date = Math.floor(Date.now() / 1000);
-  if(data.item_order == ""){
-    var maxItemOrder = await getMaxItemOrderOfCategories();
-    data.item_order = maxItemOrder + 1;
-  }
-  data.item_order = parseInt(data.item_order);
+const updateAdmin = async (req, res, next) => {
+  console.log('updating admin');
   try {
     const data = req.body;
     const id = data.id;
+    data.status = data.status == "on" ? true : false;
+    data.modified_date = Math.floor(Date.now() / 1000);
     console.log("Updating category= %s", id);
-    const category = await categoriesCollection.doc(id);
-    const updateResult = category.update(data)
+    const admin = await dbCollection.doc(id);
+    const updateResult = admin.update(data)
       .then(function() {
         console.log("Document successfully updated!");
-        res.redirect('/admin/category/index');
+        res.redirect('/admin/admin/index');
       })
       .catch(function(error) {console.error("Error deleting document: ", error);});
   } catch (error) {
@@ -160,25 +142,11 @@ const updateService = async (req, res, next) => {
   }
 };
 
-async function getMaxItemOrderOfCategories() {
-  try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'desc').limit(1).get();
-    const maxOrderDoc = querySnapshot.docs[0];
-    const maxItemOrder = maxOrderDoc.data().item_order;
-    
-    return maxItemOrder;
-  } catch (err) {
-    console.log('Error getting documents', err);
-    throw err;
-  }
-}
 
 module.exports = {
-  addService,
+  addAdmin,
   getAllAdmins,
-  getService,
-  updateService,
-  deleteAdmin,
-  getListAdmins,
-  //getMaxItemOrderOfCategories
+  getAdmin,
+  updateAdmin,
+  deleteAdmin
 };

@@ -13,9 +13,10 @@ app.use(session({
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-    getAdmin,
-    updateAdmin
-} = require(path.join(rootFolder, "/controllers/admin/adminController"));
+  addCategory,
+  getListCategories,
+  getMaxItemOrderOfCategories
+} = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
 // Middleware to check if the user is logged in
@@ -32,23 +33,22 @@ app.use(function(req, res, next) {
   next();
 });
   
-app.get('/:id', isLoggedIn, async (req,res) =>{
-    var adminUser = req.session.user;
-    var currentUrl = req.originalUrl;
-    const id = req.params.id;
-    var admin = await getAdmin(id);
-    console.log(admin);
-    res.render('./admin/admin/edit',{
-        adminUser, 
-        currentUrl, 
-        pageName: "Edit Category",
-        title: global.title,
-        breadcrumbs: req.breadcrumbs,
-        adminId: id,
-        admin
-    });
+app.get('/', isLoggedIn, async (req,res) =>{
+  var adminUser = req.session.user;
+  var currentUrl = req.originalUrl;
+  var categories = await getListCategories();
+  var maxItemOrder = await getMaxItemOrderOfCategories();
+  res.render('./admin/category/add',{
+      adminUser, 
+      currentUrl, 
+      pageName: "Add Category",
+      title: global.title,
+      breadcrumbs: req.breadcrumbs,
+      categories,
+      maxItemOrder: maxItemOrder + 1
+  });
 });
 
-app.post('/', isLoggedIn, updateAdmin);
+app.post('/', isLoggedIn, addCategory);
 
 module.exports = app

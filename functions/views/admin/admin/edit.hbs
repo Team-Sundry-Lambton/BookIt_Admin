@@ -18,13 +18,13 @@
                                     <div class="form-label xl:w-64 xl:!mr-10">
                                         <div class="text-left">
                                             <div class="flex items-center">
-                                                <div class="font-medium">Firstname</div>
+                                                <div class="font-medium">First name</div>
                                                 <div class="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">Required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="firstname" name="firstname" type="text" class="form-control" placeholder="" value="{{admin.firstname}}">
+                                        <input id="firstName" name="firstname" type="text" class="form-control" placeholder="First name of admin" value="{{admin.firstName}}">
                                         <div class="form-help text-right">Maximum character 0/70</div>
                                     </div>
                                 </div>
@@ -32,13 +32,13 @@
                                     <div class="form-label xl:w-64 xl:!mr-10">
                                         <div class="text-left">
                                             <div class="flex items-center">
-                                                <div class="font-medium">Lastname</div>
+                                                <div class="font-medium">Last name</div>
                                                 <div class="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">Required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="lastname" name="lastname" type="text" class="form-control" placeholder="" value="{{admin.lastname}}">
+                                        <input id="lastName" name="lastname" type="text" class="form-control" placeholder="Last name of admin" value="{{admin.lastName}}">
                                         <div class="form-help text-right">Maximum character 0/70</div>
                                     </div>
                                 </div>
@@ -52,7 +52,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="email" name="email" type="text" class="form-control" placeholder="Name of item" value="{{admin.email}}">
+                                        <input id="email" name="email" type="text" class="form-control" placeholder="Email of admin" value="{{admin.email}}">
                                         <div class="form-help text-right">Maximum character 0/70</div>
                                     </div>
                                 </div>
@@ -60,22 +60,20 @@
                                     <div class="form-label xl:w-64 xl:!mr-10">
                                         <div class="text-left">
                                             <div class="flex items-center">
-                                                <div class="font-medium">Phone</div>
+                                                <div class="font-medium">Contact number</div>
                                                 <div class="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">Required</div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="phone" name="phone" type="text" class="form-control" placeholder="Name of item" value="{{admin.phone}}">
+                                        <input id="phone" name="phone" type="text" class="form-control" placeholder="Phone number of admin" value="{{admin.phone}}">
                                         <div class="form-help text-right">Maximum character 0/70</div>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
                     <!-- END: Product Information -->
-                    
                     <!-- BEGIN: Upload Product -->
                     <div class="intro-y box p-5">
                         <div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
@@ -99,14 +97,14 @@
                                         <div class="w-52 mx-auto xl:mr-0 xl:ml-6">
                                             <div class="border-2 border-dashed shadow-sm border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
                                                 <div class="h-40 relative image-fit cursor-pointer zoom-in mx-auto">
-                                                    <img id="avatar" class="rounded-md" alt="" src="{{admin.avatar}}">
+                                                    <img id="picture" class="rounded-md" alt="" src="{{admin.avatar}}">
                                                     <div title="Remove this profile photo?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2">
                                                         <i data-lucide="x" class="w-4 h-4"></i>
                                                     </div>
                                                 </div>
                                                 <div class="mx-auto cursor-pointer relative mt-5">
                                                     <button id="change-photo-btn" type="button" class="btn btn-primary w-full">Select Photo</button>
-                                                    <input id="file" name="avatar" type="text" class="w-full h-full top-0 left-0 absolute opacity-0" value="{{admin.avatar}}">
+                                                    <input id="file" name="avatar" type="file" class="w-full h-full top-0 left-0 absolute opacity-0">
                                                 </div>
                                             </div>
                                         </div>
@@ -174,6 +172,8 @@
             function cancel() {
                 window.location.href = "/admin/admin/index";
             }
+            var editor = CKEDITOR.replace('description');
+            editor.setData(admin.description);
 
             const changePhotoBtn = document.getElementById('change-photo-btn');
             const fileInput = document.getElementById('file');

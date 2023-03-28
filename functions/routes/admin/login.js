@@ -26,7 +26,7 @@ app.post('/', async (req, res) => {
   const isLoggedIn = await loginData(req);
   if (isLoggedIn) {
     //res.redirect('/admin/dashboard');
-    res.redirect('/admin/booking/index');
+    res.redirect('/admin/admin/index');
   } else {
     const errorMsg = "Invalid username or password";
     res.render('./admin/login',{
@@ -39,6 +39,7 @@ app.post('/', async (req, res) => {
 
 async function loginData(req){
   const {email, password} = req.body;
+  console.log("email:", email);
   try {
     const querySnapshot = await adminsCollection.where('email', '==', email).get();
     if (!querySnapshot.empty) {
@@ -49,11 +50,14 @@ async function loginData(req){
       if (passwordMatch) {
         // Create session
         req.session.user = userDoc.data();
+        console.log("Login successful");
         return true; // Login successful
       } else {
+        console.log("Incorrect password");
         return false; // Incorrect password
       }
     } else {
+      console.log("User not found");
       return false; // User not found
     }
   } catch (error) {

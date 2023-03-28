@@ -37,11 +37,10 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
     var currentUrl = req.originalUrl;
     const id = req.params.id;
     var admin = await getAdmin(id);
-    console.log(admin);
     res.render('./admin/admin/edit',{
         adminUser, 
         currentUrl, 
-        pageName: "Edit Category",
+        pageName: "Edit Admin",
         title: global.title,
         breadcrumbs: req.breadcrumbs,
         adminId: id,

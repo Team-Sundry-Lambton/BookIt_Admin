@@ -53,10 +53,6 @@ app.get('/',isLoggedIn, async (req,res) =>{
   if(searchByCategory == "all"){
     searchByCategory = "";
   }
-  
-  console.log("searchByVendor: ", searchByVendor);
-  console.log("searchByCategory: ", searchByCategory);
-
   var page = parseInt(req.query.page) || 1;
   var limit = parseInt(req.query.limit) || global.perPage;
   const data = await getAllBookings(searchByVendor, searchByCategory, limit, page);

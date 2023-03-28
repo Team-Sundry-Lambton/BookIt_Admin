@@ -89,7 +89,7 @@
                             </div>
                             <div class="mt-5">
                                 <div class="form-inline items-start flex-col xl:flex-row mt-10">
-                                    <div class="form-label w-full xl:w-64 xl:!mr-10">
+                                    {{!-- <div class="form-label w-full xl:w-64 xl:!mr-10">
                                         <div class="text-left">
                                             <div class="flex items-center">
                                                 <div class="font-medium">Photos</div>
@@ -115,7 +115,18 @@
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
+ <form id='form'>
+            <div class="input-group">
+                <label for='name'>Your name</label>
+                <input name='name' id='name' placeholder="Enter your name" />
+            </div>
+            <div class="input-group">
+                <label for='files'>Select files</label>
+                <input id='files' type="file" multiple>
+            </div>
+            <button class="submit-btn" type='submit'>Upload</button>
+        </form>
                                 </div>
                             </div>
                         </div>
@@ -230,14 +241,26 @@
             }
             name.addEventListener("blur", validateName);
 
-            add_form.addEventListener("submit", function(event) {
-                if (name.value === "") { 
-                    password_error.innerHTML = "Please fill all required fields";
-                    event.preventDefault(); // prevent form submission
-                } else {
-                    password_error.innerHTML = "";
-                }
-            });
+
+function submitForm(e) {
+    e.preventDefault();
+    const name = document.getElementById("name");
+    const files = document.getElementById("files");
+    const formData = new FormData();
+    formData.append("name", name.value);
+    for(let i =0; i < files.files.length; i++) {
+            formData.append("files", files.files[i]);
+    }
+    fetch("/admin/category/add", {
+        method: 'POST',
+        body: formData,
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+    })
+        .then((res) => console.log(res))
+        .catch((err) => ("Error occured", err));
+}
         </script>
     {{> footer}}
       

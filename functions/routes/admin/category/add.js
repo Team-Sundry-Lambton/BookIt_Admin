@@ -49,6 +49,15 @@ app.get('/', isLoggedIn, async (req,res) =>{
   });
 });
 
-app.post('/', isLoggedIn, addCategory);
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+
+app.post("/", upload.array("files"), uploadFiles);
+function uploadFiles(req, res) {
+  console.log(req.body);
+  console.log(req.files);
+  res.json({ message: "Successfully uploaded files" });
+}
+//app.post('/', isLoggedIn, addCategory);
 
 module.exports = app

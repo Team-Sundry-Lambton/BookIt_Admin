@@ -103,9 +103,11 @@ app.use("/admin/client/edit", adminEditClientRouter);
 const adminBookingRouter = require("./routes/admin/booking/index");
 const adminAddBookingRouter = require("./routes/admin/booking/add");
 const adminEditBookingRouter = require("./routes/admin/booking/edit");
+const adminInvoiceRouter = require("./routes/admin/booking/invoice");
 app.use("/admin/booking/index", adminBookingRouter);
 app.use("/admin/booking/add", adminAddBookingRouter);
 app.use("/admin/booking/edit", adminEditBookingRouter);
+app.use("/admin/booking/invoice", adminInvoiceRouter);
 
 
 // add breadcrumbs

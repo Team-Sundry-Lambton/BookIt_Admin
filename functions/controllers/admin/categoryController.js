@@ -6,6 +6,10 @@ const admin = require('firebase-admin');
 
 const dbCollection = admin.firestore().collection('categories');
 
+const express = require('express');
+const multer = require('multer');
+
+
 
 async function getListCategories() {
   try {
@@ -77,11 +81,35 @@ async function getAllCategories(limit, page) {
 }
 
 
+
 const addCategory = async (req, res, next) => {
   try {
     console.log("Adding new Category");
     const data = req.body;
-    data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
+    console.log(data);
+    multi_upload(req, res, function (err) {
+      if (err instanceof multer.MulterError) {
+          // A Multer error occurred when uploading.
+          res.status(500).send({ error: { message: `Multer uploading error: ${err.message}` } }).end();
+          return;
+      } else if (err) {
+          // An unknown error occurred when uploading.
+          if (err.name == 'ExtensionError') {
+              res.status(413).send({ error: { message: err.message } }).end();
+          } else {
+              res.status(500).send({ error: { message: `unknown uploading error: ${err.message}` } }).end();
+          }
+          return;
+      }
+
+      // Everything went fine.
+      // show file `req.files`
+      // show body `req.body`
+      
+      res.status(200).end('Your files uploaded.');
+  })
+
+    /* data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
     data.status = data.status == "on" ? true : false;
     data.created_date = Math.floor(Date.now() / 1000);
     data.modified_date = Math.floor(Date.now() / 1000);
@@ -99,7 +127,7 @@ const addCategory = async (req, res, next) => {
       console.log("Document successfully written!");
       res.redirect('/admin/category/index');
     })
-    .catch(function(error) {console.error("Error writing document: ", error);});
+    .catch(function(error) {console.error("Error writing document: ", error);}); */
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

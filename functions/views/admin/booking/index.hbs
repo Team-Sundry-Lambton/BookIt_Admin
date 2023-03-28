@@ -32,10 +32,9 @@
                 <thead>
                     <tr>
                         <th class="whitespace-nowrap">Service</th>
-                        <th class="whitespace-nowrap">Vendor</th>
-                        <th class="whitespace-nowrap">Client</th>
                         <th class="whitespace-nowrap">Status</th>
                         <th class="whitespace-nowrap">Date</th>
+                        <th class="whitespace-nowrap">Invoice</th>
                         <th class="text-center whitespace-nowrap">ACTIONS</th>
                     </tr>
                 </thead>
@@ -44,14 +43,8 @@
                     <tr class="intro-x">
                         <td>
                             <a href="/admin/booking/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.service.serviceTitle}}</a><br/>
-                        </td>
-                        <td>
-                            <a href="/admin/booking/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.vendor.firstName}} {{this.vendor.lastName}}</a><br/>
-                            ({{this.vendor.email}})
-                        </td>
-                        <td>
-                            <a href="/admin/booking/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.client.firstName}} {{this.client.lastName}}</a><br/>
-                            ({{this.client.email}})
+                            Vendor: {{this.vendor.firstName}} {{this.vendor.lastName}} ({{this.vendor.email}})<br/>
+                            Client: {{this.client.firstName}} {{this.client.lastName}} ({{this.client.email}})
                         </td>
                         <td>
                             {{this.status}}
@@ -59,8 +52,16 @@
                         <td>
                             {{this.date}}
                         </td>
+                        <td>
+                            {{#ifCond this.status '===' "Completed"}} 
+                            <a class="flex items-center mr-3" href="/admin/booking/invoice/{{this.id}}">
+                                <i data-lucide="dollar-sign" class="w-4 h-4 mr-1"></i> Invoice
+                            </a>
+                            {{/ifCond}}
+                        </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
+                                
                                 <a class="flex items-center mr-3" href="/admin/booking/edit/{{this.id}}">
                                     <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Edit
                                 </a>

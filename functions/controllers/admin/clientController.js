@@ -14,7 +14,7 @@ async function getListClients() {
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
       let parentData = null;
-      dataResult.push({
+      results.push({
         id: doc.id,
         ...data,
       });

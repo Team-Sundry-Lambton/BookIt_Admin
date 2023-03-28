@@ -48,6 +48,7 @@
                         <th class="whitespace-nowrap">Name</th>
                         <th class="whitespace-nowrap">Email</th>
                         <th class="whitespace-nowrap">Phone</th>
+                        <th class="whitespace-nowrap">Active</th>
                         <th class="text-center whitespace-nowrap">ACTIONS</th>
                     </tr>
                 </thead>
@@ -68,6 +69,11 @@
                         </td>
                         <td>
                             {{this.phone}}
+                        </td>
+                        <td class="w-40">
+                            <div class="flex items-center justify-center {{#ifCond this.status '==' true}} text-success {{else}} text-danger{{/ifCond}}">
+                                <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> {{#ifCond this.status '==' true}} Yes {{else}} No{{/ifCond}}
+                            </div>
                         </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">

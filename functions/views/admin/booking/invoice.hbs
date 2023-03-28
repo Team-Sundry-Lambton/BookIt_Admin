@@ -1,0 +1,74 @@
+    {{> header}}
+<!-- BEGIN: Content -->
+        <div class="content">
+            <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+                <h2 class="text-lg font-medium mr-auto">Invoice</h2>
+                <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
+                    <button class="btn btn-primary shadow-md mr-2" onclick="exportPDF()">Export PDF</button>
+                </div>
+            </div>
+            <div class="intro-y box overflow-hidden mt-5">
+                <div class="flex flex-col lg:flex-row pt-10 px-5 sm:px-20 sm:pt-20 lg:pb-20 text-center sm:text-left">
+                <div class="font-semibold text-primary text-3xl">INVOICE #{{data.service.serviceId}}</div>
+                </div>
+                <div class="flex flex-col lg:flex-row border-b px-5 sm:px-20 pt-10 pb-10 sm:pb-20 text-center sm:text-left">
+                <div>
+                    <div class="text-base text-slate-500">Client Details</div>
+                    <div class="text-lg font-medium text-primary mt-2">{{data.client.firstName}} {{data.client.firstName}}</div>
+                    <div class="mt-1">{{data.client.email}}</div>
+                </div>
+                <div class="mt-10 lg:mt-0 lg:ml-auto lg:text-right">
+                    <div class="text-base text-slate-500">Vendor details</div>
+                    <div class="text-lg font-medium text-primary mt-2">{{data.vendor.firstName}} {{data.vendor.firstName}}</div>
+                    <div class="mt-1">{{data.vendor.email}}</div>
+                </div>
+                </div>
+                <div class="px-5 sm:px-16 py-10 sm:py-20">
+                <div class="overflow-x-auto">
+                    <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="border-b-2 dark:border-darkmode-400 whitespace-nowrap">DESCRIPTION</th>
+                            <th class="border-b-2 dark:border-darkmode-400 text-right whitespace-nowrap">PRICE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border-b dark:border-darkmode-400">
+                                <div class="font-medium whitespace-nowrap">{{data.service.serviceTitle}}</div>
+                                <div class="text-slate-500 text-sm mt-0.5 whitespace-nowrap">Location for service: {{data.address.address}}</div>
+                            </td>
+                            <td class="text-right border-b dark:border-darkmode-400 w-32">${{data.service.price}}</td>
+                        </tr>
+                        <tr>
+                            <td class="border-b dark:border-darkmode-400">
+                                <div class="font-medium whitespace-nowrap">Delivery</div>
+                            </td>
+                            <td class="text-right border-b dark:border-darkmode-400 w-32">$0.0</td>
+                        </tr>
+                        <tr>
+                            <td class="border-b dark:border-darkmode-400">
+                                <div class="font-medium whitespace-nowrap">Application fee (10%)</div>
+                            </td>
+                            <td class="text-right border-b dark:border-darkmode-400 w-32">${{applicationFee}}</td>
+                        </tr>
+                        <tr>
+                            <td class="text-right border-b dark:border-darkmode-400">
+                                <div class="font-medium whitespace-nowrap">TOTAL</div>
+                            </td>
+                            <td class="text-right text-xl text-primary font-medium mt-2">${{total}}</td>
+                        </tr>
+                    </tbody>
+                    </table>
+                </div>
+                </div>
+            </div>
+        </div>
+        <!-- END: Content -->
+        <script>
+            function exportPDF() {
+                window.location.href = "/admin/booking/invoice/export/{{bookingId}}";
+            }
+        </script>
+        {{> footer}}
+      

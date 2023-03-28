@@ -11,7 +11,7 @@ const addressCollection = admin.firestore().collection('address');
 async function getAllServices(searchByVendor, searchByCategory, limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('serviceId', 'asc');
+    let query = dbCollection.orderBy('serviceId', 'desc');
 
     if (searchByVendor && !searchByCategory) {
       query = dbCollection.where('parentVendor', '==', searchByVendor);

@@ -53,12 +53,17 @@ app.get('/',isLoggedIn, async (req,res) =>{
   if(searchByCategory == "all"){
     searchByCategory = "";
   }
+
+  var searchByStatus = req.query.status || "";
+  if(searchByStatus == "all"){
+    searchByStatus = "";
+  }
+
   var page = parseInt(req.query.page) || 1;
   var limit = parseInt(req.query.limit) || global.perPage;
-  const data = await getAllBookings(searchByVendor, searchByCategory, limit, page);
+  const data = await getAllBookings(searchByVendor, searchByCategory,searchByStatus, limit, page);
   const vendors = await getListVendors();
   const categories = await getListCategories();
-  
   res.render('./admin/booking/index',{
       adminUser, 
       currentUrl, 
@@ -67,6 +72,7 @@ app.get('/',isLoggedIn, async (req,res) =>{
       breadcrumbs: req.breadcrumbs,
       searchByVendor: searchByVendor,
       searchByCategory: searchByCategory,
+      searchByStatus: searchByStatus,
       vendors: vendors,
       categories: categories,
       data: data.results,

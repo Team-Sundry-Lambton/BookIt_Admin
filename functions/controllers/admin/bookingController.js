@@ -11,18 +11,15 @@ const clientCollection = admin.firestore().collection('client');
 const serviceCollection = admin.firestore().collection('service');
 const addressCollection = admin.firestore().collection('address');
 
-async function getAllBookings(searchByVendor, searchByCategory, limit, page) {
+async function getAllBookings(searchByVendor, searchByCategory, searchByStatus, limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
     let query = dbCollection.orderBy('date', 'desc');
 
-    if (searchByVendor && !searchByCategory) {
-      query = dbCollection.where('parentVendor', '==', searchByVendor);
-    } else if (!searchByVendor && searchByCategory) {
-      query = dbCollection.where('parentCategory', '==', searchByCategory);
-    } else if (searchByVendor && searchByCategory) {
-      query = dbCollection.where('parentVendor', '==', searchByVendor).where('parentCategory', '==', searchByCategory);
+    if (searchByStatus) {
+      query = dbCollection.where('status', '==', searchByStatus);
     }
+
 
     const querySnapshot = await query.limit(limit).get();
     const results = [];
@@ -191,7 +188,7 @@ const getBooking = async (id) => {
 
 
 const updateBooking = async (req, res, next) => {
-  console.log('updating cat');
+  /* console.log('updating cat');
   const id = req.params.id;
   const data = req.body;
   data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
@@ -215,7 +212,7 @@ const updateBooking = async (req, res, next) => {
       .catch(function(error) {console.error("Error deleting document: ", error);});
   } catch (error) {
     res.status(400).json({ message: error.message });
-  }
+  } */
 };
 
 const deleteBooking = async (req, res, next) => {

@@ -267,7 +267,6 @@ function generateInvoiceHtml(bookingId, data) {
 
                     <td>
                       <strong>INVOICE #: ${data.service.serviceId}</strong><br />
-                      Date: ${today}<br />
                     </td>
                   </tr>
                 </table>

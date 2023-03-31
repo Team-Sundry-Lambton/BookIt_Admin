@@ -277,22 +277,6 @@ function generateInvoiceHtml(bookingId, data) {
                                                                                                                                                 </tr>
                                                                                                                                             </tbody>
                                                                                                                                             </table>
-                                                                                                                                            <table border="0" cellpadding="0" cellspacing="0" class="m_-2308682559127387126t3of12 m_-2308682559127387126gmail_header_icon_table" style="border:none;border-collapse:collapse;border-spacing:0;display:inline-block;max-width:144px;vertical-align:bottom;width:100%">
-                                                                                                                                            <tbody>
-                                                                                                                                                <tr>
-                                                                                                                                                <td style="font-size:1px;height:1px;line-height:1px;padding-left:0!important;padding-right:0!important;direction:ltr;text-align:left">
-                                                                                                                                                    <table border="0" cellpadding="0" cellspacing="0" width="100%" align="left" style="border:none;border-collapse:collapse;border-spacing:0;table-layout:fixed;width:100%">
-                                                                                                                                                    <tbody>
-                                                                                                                                                        <tr>
-                                                                                                                                                        <td style="padding-top:0;direction:ltr;text-align:left">
-                                                                                                                                                        </td>
-                                                                                                                                                        </tr>
-                                                                                                                                                    </tbody>
-                                                                                                                                                    </table>
-                                                                                                                                                </td>
-                                                                                                                                                </tr>
-                                                                                                                                            </tbody>
-                                                                                                                                            </table>
                                                                                                                                         </td>
                                                                                                                                         </tr>
                                                                                                                                     </tbody>
@@ -369,13 +353,6 @@ function generateInvoiceHtml(bookingId, data) {
                                                                                                             <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                                                                                                                 <tbody>
                                                                                                                 <tr>
-                                                                                                                    <td align="left" style="padding-left:12px;padding-right:12px"></td>
-                                                                                                                </tr>
-                                                                                                                </tbody>
-                                                                                                            </table>
-                                                                                                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
-                                                                                                                <tbody>
-                                                                                                                <tr>
                                                                                                                     <td align="left" style="padding-left:12px;padding-right:12px">
                                                                                                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                                                                                                                         <tbody>
@@ -401,21 +378,6 @@ function generateInvoiceHtml(bookingId, data) {
                                                                                                                 <tr>
                                                                                                                     <td align="left" style="padding-left:12px;padding-right:12px">
                                                                                                                     <span class="im">
-                                                                                                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
-                                                                                                                        <tbody>
-                                                                                                                            <tr>
-                                                                                                                            <td style="padding-top:26px;padding-bottom:26px">
-                                                                                                                                <table border="0" cellpadding="0" cellspacing="0" width="100%" align="left" style="border:none;border-collapse:collapse;border-spacing:0;table-layout:fixed;width:100%">
-                                                                                                                                <tbody>
-                                                                                                                                    <tr>
-                                                                                                                                    <td valign="top" align="left" style="font-size:1px;line-height:1px;background-color:#bdbdbd">&nbsp;</td>
-                                                                                                                                    </tr>
-                                                                                                                                </tbody>
-                                                                                                                                </table>
-                                                                                                                            </td>
-                                                                                                                            </tr>
-                                                                                                                        </tbody>
-                                                                                                                        </table>
                                                                                                                         <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                                                                                                                         <tbody>
                                                                                                                             <tr>

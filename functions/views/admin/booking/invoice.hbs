@@ -71,7 +71,7 @@
                 const exportButton = document.querySelector('.export-pdf-btn');
                 exportButton.disabled = true;
 
-                const url = `/admin/booking/invoice/export/${bookingId}`;
+                const url = `/admin/api/invoice/export/${bookingId}`;
                 window.location.href = url;
             }
         </script>

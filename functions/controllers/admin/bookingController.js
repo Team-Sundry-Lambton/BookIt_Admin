@@ -215,6 +215,23 @@ const updateBooking = async (req, res, next) => {
   } */
 };
 
+const updateInvoiceBooking = async (bookingId, url) => {
+  console.log('updating bookingId:', bookingId);
+  try {
+    const booking = await dbCollection.doc(bookingId);
+    const updateResult = booking.update({
+      invoiceURL: url
+    })
+      .then(function() {
+        console.log("Document successfully updated!");
+        res.redirect('/admin/booking/index');
+      })
+      .catch(function(error) {console.error("Error deleting document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 const deleteBooking = async (req, res, next) => {
   try {
     const id = req.body.adminId;
@@ -235,5 +252,6 @@ module.exports = {
   getAllBookings,
   getBooking,
   updateBooking,
-  deleteBooking
+  deleteBooking,
+  updateInvoiceBooking
 };

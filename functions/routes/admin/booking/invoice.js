@@ -14,13 +14,18 @@ app.use(session({
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const moment = require('moment-timezone');
-
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const bucket = admin.storage().bucket();
-
+// Configure middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+app.use(cors());
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-  getBooking
+  getBooking,
+  updateInvoiceBooking
 } = require(path.join(rootFolder, "/controllers/admin/bookingController"));
 
 // Middleware to check if the user is logged in
@@ -65,47 +70,54 @@ app.get('/export/:id', isLoggedIn, async (req, res) => {
   const bookingId = req.params.id;
   var data = await getBooking(bookingId);
   data = data[0];
-
   const rootPath = path.join(__dirname, '../../../../');
+  if(data.booking.invoiceURL.empty){
 
-  const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
-  const htmlContent = generateInvoiceHtml(bookingId, data); 
-  const pdfBuffer = await exportPDF(htmlContent);
+    const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
+    const htmlContent = generateInvoiceHtml(bookingId, data); 
+    const pdfBuffer = await exportPDF(htmlContent);
 
-  if (!pdfBuffer || pdfBuffer.length === 0) {
-    return res.status(500).send('Error generating PDF data');
-  }
+    if (!pdfBuffer || pdfBuffer.length === 0) {
+      return res.status(500).send('Error generating PDF data');
+    }
 
-  // Ensure that parent directories of the PDF file exist
-  const parentDirs = path.dirname(pdfFilePath);
-  if (!fs.existsSync(parentDirs)) {
-    fs.mkdirSync(parentDirs, { recursive: true });
-  }
+    // Ensure that parent directories of the PDF file exist
+    const parentDirs = path.dirname(pdfFilePath);
+    if (!fs.existsSync(parentDirs)) {
+      fs.mkdirSync(parentDirs, { recursive: true });
+    }
 
-  // Write the PDF buffer to a file
-  const pdfStream = fs.createWriteStream(pdfFilePath);
-  pdfStream.write(pdfBuffer);
-  pdfStream.on('finish', async () => {
-    // Upload the PDF file to Firebase Storage
-    const fileUploadResult = await bucket.upload(pdfFilePath, {
-      destination: `invoices/invoice_${data.service.serviceId}.pdf`
+    // Write the PDF buffer to a file
+    const pdfStream = fs.createWriteStream(pdfFilePath);
+    pdfStream.write(pdfBuffer);
+    pdfStream.on('finish', async () => {
+      // Upload the PDF file to Firebase Storage
+      const fileUploadResult = await bucket.upload(pdfFilePath, {
+        destination: `invoices/invoice_${data.service.serviceId}.pdf`
+      });
+
+      // Delete the PDF file from the local filesystem
+      //fs.unlinkSync(pdfFilePath);
+
+      // Get the public URL for the uploaded file
+      const file = fileUploadResult[0];
+      const url = await file.getSignedUrl({
+        action: 'read',
+        expires: '03-31-2024' // Set the expiration date of the URL
+      });
+
+      res.download(pdfFilePath);
+      await updateInvoiceBooking(bookingId, url[0]);
+      console.log(`PDF file has been exported, uploaded to Firebase Storage, and downloaded. URL: ${url}`);
+
     });
-
-    // Delete the PDF file from the local filesystem
-    //fs.unlinkSync(pdfFilePath);
-
-    // Get the public URL for the uploaded file
-    const file = fileUploadResult[0];
-    const url = await file.getSignedUrl({
-      action: 'read',
-      expires: '03-31-2024' // Set the expiration date of the URL
-    });
-
+    pdfStream.end();
+  } else {
+    const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
     res.download(pdfFilePath);
-    console.log(`PDF file has been exported, uploaded to Firebase Storage, and downloaded. URL: ${url}`);
+  }
 
-  });
-  pdfStream.end();
+  
 });
 
 async function exportPDF(htmlContent) {
@@ -324,4 +336,5 @@ function generateInvoiceHtml(bookingId, data) {
   const invoiceDiv = document.getElementById('invoice');
   return invoiceDiv.innerHTML;
 }
+
 module.exports = app

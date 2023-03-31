@@ -109,6 +109,8 @@ app.use("/admin/booking/add", adminAddBookingRouter);
 app.use("/admin/booking/edit", adminEditBookingRouter);
 app.use("/admin/booking/invoice", adminInvoiceRouter);
 
+const apiRouter = require("./routes/admin/api");
+app.use("/admin/api", apiRouter);
 
 // add breadcrumbs
 get_breadcrumbs = function(url) {

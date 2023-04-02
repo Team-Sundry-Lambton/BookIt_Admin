@@ -3,8 +3,8 @@ const path = require('path');
 const rootFolder = process.cwd();
 const config = require(path.join(rootFolder, "/config/db"));;
 const admin = require('firebase-admin');
-
-const dbCollection = admin.firestore().collection('review');
+const moment = require('moment-timezone');
+const dbCollection = admin.firestore().collection('vendorReview');
 const vendorCollection = admin.firestore().collection('vendor');
 const clientCollection = admin.firestore().collection('client');
 const serviceCollection = admin.firestore().collection('service');
@@ -70,7 +70,11 @@ async function getAllReviews(searchByVendor, searchByClient, limit, page) {
         client = null;
       }
       
-      console.log("data:", data);
+      const timestamp = data.date;
+      const date = new Date(timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000);
+      const timeZone = 'America/New_York';
+      const convertedDate = moment(date).tz(timeZone).format('MMMM DD, YYYY [at] h:mm:ss A');
+      data.date = convertedDate;
 
       results.push({
         id: doc.id,

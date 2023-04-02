@@ -18,6 +18,12 @@
                         <option value="{{this.name}}" {{#ifCond ../searchByCategory '===' this.name}} selected {{/ifCond}}>{{this.name}}</option>
                         {{/each}}
                     </select>
+                    <select id="searchStatus" class="form-select box ml-2" name="status">
+                        <option value="all" {{#ifCond searchByStatus '===' ""}} selected {{/ifCond}}>All status</option>
+                        <option {{#ifCond searchByStatus '===' "Accepted"}} selected {{/ifCond}} value="Accepted">Accepted</option>
+                        <option {{#ifCond searchByStatus '===' "Rejected"}} selected {{/ifCond}} value="Rejected">Rejected</option>
+                        <option {{#ifCond searchByStatus '===' "Pending"}} selected {{/ifCond}} value="Pending">Pending</option>
+                    </select>
             </form>
             <div class="hidden md:block mx-auto text-slate-500">Page {{currentPage}} - Showing {{data.length}} of {{total}} entries</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
@@ -37,7 +43,7 @@
                         <th class="whitespace-nowrap">Price</th>
                         <th class="whitespace-nowrap">Equipment</th>
                         <th class="whitespace-nowrap">Cancel Policy</th>
-                        <th class="whitespace-nowrap">Accepted</th>
+                        <th class="whitespace-nowrap">Status</th>
                         <th class="text-center whitespace-nowrap">ACTIONS</th>
                     </tr>
                 </thead>
@@ -61,7 +67,6 @@
                             <a target="_blank" class="flex items-center text-danger deleteRecord" href="https://www.google.com/maps?q={{this.location.latitude}},{{this.location.longitude}}" title="{{this.location.address}}">
                                 <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i> View on Maps
                             </a>
-                            {{!-- {{this.serviceDescription}} --}}
                         </td>
                         <td>
                             $ {{this.price}}/ {{this.priceType}}
@@ -76,17 +81,15 @@
                             {{this.cancelPolicy}}
                         </td>
                         <td class="w-40">
-                            <div class="form-check form-switch">
-                                {{#if this.accepted}}
-                                    <div class="flex items-center justify-center text-success">
-                                        <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> Accepted
-                                    </div>
-                                {{else}}
-                                    <a class="flex items-center text-danger approveService" href="javascript:;" data-tw-toggle="modal" data-id="{{this.id}}" data-tw-target="#approve-confirmation-modal">
-                                        <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Accept now?
-                                    </a>
-                                {{/if}}
-                            </div>
+                            <form class="w-full xl:w-auto flex items-center mt-3 xl:mt-0" id="status-form" action="/admin/service/index/approve" method="POST">
+                            <select id="status" class="form-select" data-id="{{this.id}}">
+                                <option {{#ifCond this.status '===' "Accepted"}} selected {{/ifCond}} value="Accepted">Accepted</option>
+                                <option {{#ifCond this.status '===' "Rejected"}} selected {{/ifCond}} value="Rejected">Rejected</option>
+                                <option {{#ifCond this.status '===' "Pending"}} selected {{/ifCond}} value="Pending">Pending</option>
+                            </select>
+                            <input type="hidden" name="serviceId" id="serviceIdInput" value="">
+                            <input type="hidden" name="status" id="statusInput" value="">
+                            </form>
                         </td>
                         <td class="table-report__action w-56">
                             <div class="flex justify-center items-center">
@@ -217,6 +220,7 @@
                
                 var selectElementvendor = document.querySelector('#parentVendor');
                 var selectElementCat = document.querySelector('#parentCategory');
+                var selectElementStatus = document.querySelector('#searchStatus');
               
                 selectElementvendor.addEventListener('change', function(event) {
                     var selectedValueVendor = selectElementvendor.value;
@@ -234,7 +238,24 @@
                     form.submit();
                 });
 
+                selectElementStatus.addEventListener('change', function(event) {
+                    var selectedValueStatus = selectElementStatus.value;
+                    var url = form.getAttribute('action') + '?status=' + encodeURIComponent(selectedValueStatus);
+                    form.setAttribute('action', url);
+                    form.submit();
+                });
 
+                var statusform = document.querySelector('#status-form');
+
+                document.querySelectorAll('#status').forEach((statusBtn) => {
+                    statusBtn.addEventListener('change', () => {
+                        const serviceId = statusBtn.dataset.id;
+                        var status = statusBtn.value;
+                        document.getElementById('serviceIdInput').value = serviceId;
+                        document.getElementById('statusInput').value = status;
+                        statusform.submit();
+                    });
+                });
             });
         </script>
 

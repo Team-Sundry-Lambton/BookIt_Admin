@@ -14,8 +14,7 @@ const path = require('path');
 const rootFolder = process.cwd();
 const {
     getCategory,
-    updateCategory,
-    getListCategories
+    updateCategory
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
@@ -38,8 +37,6 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
     var currentUrl = req.originalUrl;
     const id = req.params.id;
     var category = await getCategory(id);
-    var categories = await getListCategories();
-    console.log(category);
     res.render('./admin/category/edit',{
         adminUser, 
         currentUrl, 
@@ -47,8 +44,7 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
         title: global.title,
         breadcrumbs: req.breadcrumbs,
         categoryId: id,
-        category,
-        categories
+        category
     });
 });
 

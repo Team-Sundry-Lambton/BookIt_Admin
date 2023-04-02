@@ -228,25 +228,14 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                                    <div class="form-label xl:w-64 xl:!mr-10">
-                                        <div class="text-left">
-                                            <div class="flex items-center">
-                                                <div class="font-medium">Order</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="product-stock" type="text" name="item_order" value="{{service.item_order}}" class="form-control" placeholder="The order of item">
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
                     <!-- END: Product Management -->
                     <div class="flex justify-end flex-col md:flex-row gap-2 mt-5">
                         <span id="password-error" style="color: red;"></span>
-                        <input id="id" type="hidden" name="id" value="{{serviceId}}">
+                        <input id="id" type="hidden" name="id" value="{{id}}">
+                        <input id="serviceId" type="hidden" name="serviceId" value="{{service.serviceId}}">
                         <button type="button" onclick="cancel()" class="btn py-3 border-slate-300 dark:border-darkmode-400 text-slate-500 w-full md:w-52">Cancel</button>
                         <button type="submit" class="btn py-3 btn-primary w-full md:w-52">Save</button>
                     </div>

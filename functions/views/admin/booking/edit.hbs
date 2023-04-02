@@ -23,7 +23,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="serviceTitle" name="serviceTitle" type="text" class="form-control" placeholder="Name of booking" value="{{data.service.serviceTitle}}">
+                                        <input id="serviceTitle" disabled name="serviceTitle" type="text" class="form-control" placeholder="Name of booking" value="{{data.service.serviceTitle}}">
                                     </div>
                                 </div>
                                 
@@ -36,7 +36,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="date" name="date" type="text" class="form-control" placeholder="Booking date" value="{{data.booking.date}}">
+                                        <input id="date" name="date" disabled type="text" class="form-control" placeholder="Booking date" value="{{data.booking.date}}">
                                     </div>
                                 </div>
 
@@ -54,7 +54,7 @@
                                             <option {{#ifCond data.booking.status '===' "Pending"}} selected {{/ifCond}} value="Pending">Pending</option>
                                             <option {{#ifCond data.booking.status '===' "In progress"}} selected {{/ifCond}} value="In progress">In progress</option>
                                             <option {{#ifCond data.booking.status '===' "Completed"}} selected {{/ifCond}} value="Completed">Completed</option>
-                                            <option {{#ifCond data.booking.status '===' "Cancel"}} selected {{/ifCond}} value="Cancel">Cancel</option>
+                                            <option {{#ifCond data.booking.status '===' "Cancelled"}} selected {{/ifCond}} value="Cancelled">Cancel</option>
                                         </select>
                                     </div>
                                 </div>
@@ -68,7 +68,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <select id="booking" class="form-select" name="clientEmailAddress">
+                                        <select id="booking" class="form-select" name="clientEmailAddress" disabled>
                                             <option value="">--No parent client--</option>
                                             {{#each clients}}
                                             <option {{#ifCond ../data.booking.clientEmailAddress '===' this.email}} selected {{/ifCond}} value="{{this.email}}">{{this.firstName}} {{this.lastName}} ({{this.email}})</option>
@@ -86,7 +86,7 @@
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <select id="booking" class="form-select" name="vendorEmailAddress">
+                                        <select id="booking" class="form-select" name="vendorEmailAddress" disabled>
                                             <option value="">--No parent vendor--</option>
                                             {{#each vendors}}
                                             <option {{#ifCond ../data.booking.vendorEmailAddress '===' this.email}} selected {{/ifCond}} value="{{this.email}}">{{this.firstName}} {{this.lastName}} ({{this.email}})</option>

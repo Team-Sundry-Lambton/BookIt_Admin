@@ -188,31 +188,23 @@ const getBooking = async (id) => {
 
 
 const updateBooking = async (req, res, next) => {
-  /* console.log('updating cat');
-  const id = req.params.id;
-  const data = req.body;
-  data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
-  data.status = data.status == "on" ? true : false;
-  data.modified_date = Math.floor(Date.now() / 1000);
-  if(data.item_order == ""){
-    var maxItemOrder = await getMaxItemOrderOfCategories();
-    data.item_order = maxItemOrder + 1;
-  }
-  data.item_order = parseInt(data.item_order);
+  console.log('updating cat');
   try {
     const data = req.body;
     const id = data.id;
     console.log("Updating category= %s", id);
-    const category = await categoriesCollection.doc(id);
-    const updateResult = category.update(data)
+    const booking = await dbCollection.doc(id);
+    const updateResult = booking.update({
+      status: data.status
+    })
       .then(function() {
         console.log("Document successfully updated!");
-        res.redirect('/admin/category/index');
+        res.redirect('/admin/booking/index');
       })
       .catch(function(error) {console.error("Error deleting document: ", error);});
   } catch (error) {
     res.status(400).json({ message: error.message });
-  } */
+  }
 };
 
 const updateInvoiceBooking = async (bookingId, url) => {

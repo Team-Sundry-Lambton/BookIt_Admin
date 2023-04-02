@@ -12,11 +12,14 @@ app.use(session({
 }));
 const path = require('path');
 const rootFolder = process.cwd();
+const { addService } = require('../../../controllers/admin/serviceController');
 const {
-  addCategory,
-  getListCategories,
-  getMaxItemOrderOfCategories
+  getListCategories
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
+
+const {
+  getListVendors
+} = require(path.join(rootFolder, "/controllers/admin/vendorController"));
 
 
 // Middleware to check if the user is logged in
@@ -37,18 +40,18 @@ app.get('/', isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
   var categories = await getListCategories();
-  var maxItemOrder = await getMaxItemOrderOfCategories();
-  res.render('./admin/category/add',{
+  var vendors = await getListVendors();
+  res.render('./admin/service/add',{
       adminUser, 
       currentUrl, 
-      pageName: "Add Category",
+      pageName: "Add service",
       title: global.title,
       breadcrumbs: req.breadcrumbs,
       categories,
-      maxItemOrder: maxItemOrder + 1
+      vendors: vendors
   });
 });
 
-app.post('/', isLoggedIn, addCategory);
+app.post('/', isLoggedIn, addService);
 
 module.exports = app

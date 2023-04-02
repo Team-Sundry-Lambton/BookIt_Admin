@@ -6,7 +6,7 @@
             </div>
             <div class="grid grid-cols-11 gap-x-6 mt-5 pb-20">
                 <div class="intro-y col-span-11 2xl:col-span-9">
-                    <form id="edit-form" action="/admin/category/edit" method="POST" enctype="multipart/form-data">
+                    <form id="edit-form" action="/admin/category/edit" method="POST">
                     <!-- BEGIN: Product Information -->
                     <div class="intro-y box p-5 mt-5">
                         <div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
@@ -29,23 +29,6 @@
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
                                         <input id="name" name="name" type="text" class="form-control" placeholder="Name of item" value="{{category.name}}">
                                         <div class="form-help text-right">Maximum character 0/70</div>
-                                    </div>
-                                </div>
-                                <div class="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                                    <div class="form-label xl:w-64 xl:!mr-10">
-                                        <div class="text-left">
-                                            <div class="flex items-center">
-                                                <div class="font-medium">Parent Category</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <select id="category" class="form-select" name="parent_id">
-                                            <option value="">--No parent category--</option>
-                                            {{#each categories}}
-                                            <option {{#ifCond ../category.parent_id '===' this.id}} selected {{/ifCond}} value="{{this.id}}">{{this.name}}</option>
-                                            {{/each}}
-                                    </select>
                                     </div>
                                 </div>
                             </div>
@@ -148,18 +131,6 @@
                                                 <span id="status-text">{{#if category.status}}Active{{else}}Inactive{{/if}}</span>
                                             </label>
                                         </div>
-                                    </div>
-                                </div>
-                                <div class="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">
-                                    <div class="form-label xl:w-64 xl:!mr-10">
-                                        <div class="text-left">
-                                            <div class="flex items-center">
-                                                <div class="font-medium">Order</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <input id="product-stock" type="text" name="item_order" value="{{category.item_order}}" class="form-control" placeholder="The order of item">
                                     </div>
                                 </div>
                             </div>

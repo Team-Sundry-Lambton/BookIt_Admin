@@ -14,8 +14,7 @@ const path = require('path');
 const rootFolder = process.cwd();
 const {
   getService,
-  updateService,
-  //getListCategories
+  updateService
 } = require(path.join(rootFolder, "/controllers/admin/serviceController"));
 
 const {
@@ -47,16 +46,16 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
     var currentUrl = req.originalUrl;
     const id = req.params.id;
     var service = await getService(id);
+    console.log(service);
     var categories = await getListCategories();
     var vendors = await getListVendors();
-    console.log(service);
     res.render('./admin/service/edit',{
         adminUser, 
         currentUrl, 
         pageName: "Edit service",
         title: global.title,
         breadcrumbs: req.breadcrumbs,
-        serviceId: id,
+        id: id,
         service,
         vendors,
         categories

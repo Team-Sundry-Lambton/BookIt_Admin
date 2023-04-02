@@ -23,7 +23,7 @@
                         <option {{#ifCond searchByStatus '===' "Pending"}} selected {{/ifCond}} value="Pending">Pending</option>
                         <option {{#ifCond searchByStatus '===' "In progress"}} selected {{/ifCond}} value="In progress">In progress</option>
                         <option {{#ifCond searchByStatus '===' "Completed"}} selected {{/ifCond}} value="Completed">Completed</option>
-                        <option {{#ifCond searchByStatus '===' "Cancel"}} selected {{/ifCond}} value="Cancel">Cancel</option>
+                        <option {{#ifCond searchByStatus '===' "Cancelled"}} selected {{/ifCond}} value="Cancelled">Cancel</option>
                     </select>
             </form>
             <div class="hidden md:block mx-auto text-slate-500">Page {{currentPage}} - Showing {{data.length}} of {{total}} entries</div>

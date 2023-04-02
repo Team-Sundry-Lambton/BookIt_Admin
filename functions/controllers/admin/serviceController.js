@@ -106,63 +106,6 @@ const getService = async (id) => {
   }
 };
 
-
-const updateService = async (req, res, next) => {
-  console.log('updating cat');
-  const id = req.params.id;
-  const data = req.body;
-  data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
-  data.status = data.status == "on" ? true : false;
-  data.modified_date = Math.floor(Date.now() / 1000);
-  if(data.item_order == ""){
-    var maxItemOrder = await getMaxItemOrderOfCategories();
-    data.item_order = maxItemOrder + 1;
-  }
-  data.item_order = parseInt(data.item_order);
-  try {
-    const data = req.body;
-    const id = data.id;
-    console.log("Updating category= %s", id);
-    const category = await categoriesCollection.doc(id);
-    const updateResult = category.update(data)
-      .then(function() {
-        console.log("Document successfully updated!");
-        res.redirect('/admin/category/index');
-      })
-      .catch(function(error) {console.error("Error deleting document: ", error);});
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
-const addService = async (req, res, next) => {
-  try {
-    console.log("Adding new Category");
-    const data = req.body;
-    data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
-    data.status = data.status == "on" ? true : false;
-    data.created_date = Math.floor(Date.now() / 1000);
-    data.modified_date = Math.floor(Date.now() / 1000);
-    const writeResult = await categoriesCollection.add({
-      name: data.name,
-      picture: data.picture,
-      description: data.description,
-      item_order: parseInt(data.item_order),
-      status: data.status,
-      parent_id: data.parent_id,
-      created_date: data.created_date,
-      modified_date: data.modified_date
-    })
-    .then(function() {
-      console.log("Document successfully written!");
-      res.redirect('/admin/category/index');
-    })
-    .catch(function(error) {console.error("Error writing document: ", error);});
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
-
 const deleteService = async (req, res, next) => {
   try {
     const id = req.body.categoryId;
@@ -197,6 +140,83 @@ const approveService = async (req, res, next) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+
+const updateService = async (req, res, next) => {
+  
+  try {
+    const data = req.body;
+    const id = data.id;
+    console.log("Updating service= %s", id);
+    data.equipment = data.equipment == "on" ? true : false;
+    data.modified_date = Math.floor(Date.now() / 1000);
+    const service = await dbCollection.doc(id);
+    const updateResult = service.update({
+      cancelPolicy: data.cancelPolicy,
+      modified_date: data.modified_date,
+      equipment: data.equipment,
+      parentCategory: data.parentCategory,
+      parentVendor: data.parentVendor,
+      price: data.price,
+      priceType: data.priceType,
+      serviceDescription: data.serviceDescription,
+      serviceTitle: data.serviceTitle,
+      serviceId: data.serviceId,
+      status: data.status
+    })
+      .then(function() {
+        console.log("Document successfully updated!");
+        res.redirect('/admin/service/index');
+      })
+      .catch(function(error) {console.error("Error deleting document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const addService = async (req, res, next) => {
+  try {
+    console.log("Adding new service");
+    const data = req.body;
+    data.created_date = Math.floor(Date.now() / 1000);
+    data.equipment = data.equipment == "on" ? true : false;
+    var maxId = await getMaxServiceId();
+    data.serviceId = maxId + 1;
+    const writeResult = await dbCollection.add({
+      cancelPolicy: data.cancelPolicy,
+      created_date: data.created_date,
+      equipment: data.equipment,
+      parentCategory: data.parentCategory,
+      parentVendor: data.parentVendor,
+      price: data.price,
+      priceType: data.priceType,
+      serviceDescription: data.serviceDescription,
+      serviceTitle: data.serviceTitle,
+      serviceId: data.serviceId,
+      status: data.status
+    })
+    .then(function() {
+      console.log("Document successfully written!");
+      res.redirect('/admin/service/index');
+    })
+    .catch(function(error) {console.error("Error writing document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+async function getMaxServiceId() {
+  try {
+    const querySnapshot = await dbCollection.orderBy('serviceId', 'desc').limit(1).get();
+    const maxIdDoc = querySnapshot.docs[0];
+    const maxId = maxIdDoc.data().serviceId;
+
+    return maxId;
+  } catch (err) {
+    console.log('Error getting documents', err);
+    throw err;
+  }
+}
 
 
 module.exports = {

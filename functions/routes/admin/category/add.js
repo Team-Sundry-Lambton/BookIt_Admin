@@ -13,9 +13,7 @@ app.use(session({
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-  addCategory,
-  getListCategories,
-  getMaxItemOrderOfCategories
+  addCategory
 } = require(path.join(rootFolder, "/controllers/admin/categoryController"));
 
 
@@ -36,28 +34,16 @@ app.use(function(req, res, next) {
 app.get('/', isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
-  var categories = await getListCategories();
-  var maxItemOrder = await getMaxItemOrderOfCategories();
   res.render('./admin/category/add',{
       adminUser, 
       currentUrl, 
       pageName: "Add Category",
       title: global.title,
-      breadcrumbs: req.breadcrumbs,
-      categories,
-      maxItemOrder: maxItemOrder + 1
+      breadcrumbs: req.breadcrumbs
   });
 });
 
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+app.post('/', isLoggedIn, addCategory);
 
-app.post("/", upload.array("files"), uploadFiles);
-function uploadFiles(req, res) {
-  console.log(req.body);
-  console.log(req.files);
-  res.json({ message: "Successfully uploaded files" });
-}
-//app.post('/', isLoggedIn, addCategory);
 
 module.exports = app

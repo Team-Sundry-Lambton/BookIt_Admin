@@ -10,14 +10,7 @@ app.use(session({
     maxAge: 3600000 // Set the session to expire in 1 hour
   } 
 }));
-const path = require('path');
-const rootFolder = process.cwd();
-const {
-  addCategory,
-  getListCategories,
-  getMaxItemOrderOfCategories
-} = require(path.join(rootFolder, "/controllers/admin/categoryController"));
-
+const { addVendor } = require('../../../controllers/admin/vendorController');
 
 // Middleware to check if the user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -36,19 +29,15 @@ app.use(function(req, res, next) {
 app.get('/', isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
-  var categories = await getListCategories();
-  var maxItemOrder = await getMaxItemOrderOfCategories();
-  res.render('./admin/category/add',{
+  res.render('./admin/vendor/add',{
       adminUser, 
       currentUrl, 
-      pageName: "Add Category",
+      pageName: "Add vendor",
       title: global.title,
-      breadcrumbs: req.breadcrumbs,
-      categories,
-      maxItemOrder: maxItemOrder + 1
+      breadcrumbs: req.breadcrumbs
   });
 });
 
-app.post('/', isLoggedIn, addCategory);
+app.post('/', isLoggedIn, addVendor);
 
 module.exports = app

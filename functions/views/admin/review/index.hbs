@@ -4,20 +4,6 @@
                 <h2 class="intro-y text-lg font-medium mt-10">{{pageName}}</h2>
         <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <form class="w-full xl:w-auto flex items-center mt-3 xl:mt-0" id="filter-form" action="/admin/service/index" method="get">
-                    <select id="parentVendor" class="form-select box ml-2" name="vendor">
-                        <option value="all" {{#ifCond searchByVendor '===' ""}} selected {{/ifCond}}>All vendors</option>
-                        {{#each vendors}}
-                        <option value="{{this.email}}" {{#ifCond ../searchByVendor '===' this.email}} selected {{/ifCond}}>{{this.firstName}} {{this.lastName}} ({{this.email}})</option>
-                        {{/each}}
-                    </select>
-                    <select id="parentClient" class="form-select box ml-2" name="client">
-                        <option value="all" {{#ifCond searchByClient '===' ""}} selected {{/ifCond}}>All clients</option>
-                        {{#each clients}}
-                        <option value="{{this.email}}" {{#ifCond ../searchByClient '===' this.email}} selected {{/ifCond}}>{{this.firstName}} {{this.lastName}} ({{this.email}})</option>
-                        {{/each}}
-                    </select>
-            </form>
             <div class="hidden md:block mx-auto text-slate-500">Page {{currentPage}} - Showing {{data.length}} of {{total}} entries</div>
             <div class="w-full sm:w-auto mt-3 sm:mt-0 sm:ml-auto md:ml-0">
                 <div class="w-56 relative text-slate-500">
@@ -51,18 +37,18 @@
                         <td class="w-40">
                             <div class="flex">
                                 {{#ifCond this.vendorRating '==' true}} 
-                                    {{this.client.firstName}} {{this.client.lastName}} ({{this.client.email}}) 
+                                    Client: {{this.client.firstName}} {{this.client.lastName}} ({{this.client.email}}) 
                                 {{else}}
-                                    {{this.vendor.firstName}} {{this.vendor.lastName}} ({{this.client.email}}) 
+                                    Vendor: {{this.vendor.firstName}} {{this.vendor.lastName}} ({{this.client.email}}) 
                                 {{/ifCond}}
                             </div>
                         </td>
                         <td class="w-40">
                             <div class="flex">
                                 {{#ifCond this.vendorRating '==' true}} 
-                                    {{this.vendor.firstName}} {{this.vendor.lastName}} ({{this.client.email}}) 
+                                   Vendor:  {{this.vendor.firstName}} {{this.vendor.lastName}} ({{this.client.email}}) 
                                 {{else}}
-                                    {{this.client.firstName}} {{this.client.lastName}} ({{this.client.email}}) 
+                                   Client:  {{this.client.firstName}} {{this.client.lastName}} ({{this.client.email}}) 
                                 {{/ifCond}}
                             </div>
                         </td>
@@ -180,31 +166,6 @@
                     const adminId = deleteBtn.dataset.id;
                     document.getElementById('adminIdInput').value = adminId;
                 });
-            });
-
-            document.addEventListener('DOMContentLoaded', function() {
-                var form = document.querySelector('#filter-form');
-               
-                var selectElementvendor = document.querySelector('#parentVendor');
-                var selectElementClient = document.querySelector('#parentClient');
-              
-                selectElementvendor.addEventListener('change', function(event) {
-                    var selectedValueVendor = selectElementvendor.value;
-                    var selectedValueClient = selectElementClient.value;
-                    var url = form.getAttribute('action') + '?vendor=' + encodeURIComponent(selectedValueVendor) + '?category=' + encodeURIComponent(selectedValueClient);
-                    form.setAttribute('action', url);
-                    form.submit();
-                });
-
-                selectElementClient.addEventListener('change', function(event) {
-                    var selectedValueVendor = selectElementvendor.value;
-                    var selectedValueClient = selectElementClient.value;
-                    var url = form.getAttribute('action') + '?vendor=' + encodeURIComponent(selectedValueVendor) + '?category=' + encodeURIComponent(selectedValueClient);
-                    form.setAttribute('action', url);
-                    form.submit();
-                });
-
-
             });
         </script>
 

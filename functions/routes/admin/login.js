@@ -26,7 +26,7 @@ app.post('/', async (req, res) => {
   const isLoggedIn = await loginData(req);
   if (isLoggedIn) {
     //res.redirect('/admin/dashboard');
-    res.redirect('/admin/review/index');
+    res.redirect('/admin/service/index');
   } else {
     const errorMsg = "Invalid username or password";
     res.render('./admin/login',{

@@ -63,6 +63,17 @@
                         </td>
                         <td>
                             <a href="/admin/client/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.firstName}} {{this.lastName}}</a>
+                            <div class="flex">
+                                <div class="flex items-center">
+                                    <div class="flex items-center">
+                                        {{#range 1 this.rating}}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" icon-name="star" data-lucide="star" class="lucide lucide-star text-pending fill-pending/30 w-4 h-4 mr-1"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                        {{/range}}
+                                    </div>
+                                    <div class="text-xs text-slate-500 ml-1">({{this.rating}})
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                         <td>
                             {{this.email}}
@@ -129,13 +140,6 @@
                     
                 </ul>
             </nav>
-            {{!-- <select class="w-20 form-select box mt-3 sm:mt-0" onchange="updateResultsPerPage()">
-                <option>4</option>
-                <option>10</option>
-                <option>25</option>
-                <option>35</option>
-                <option>50</option>
-            </select> --}}
         </div>
         <!-- END: Pagination -->
     </div>
@@ -174,45 +178,6 @@
                     document.getElementById('clientIdInput').value = clientId;
                 });
             });
-
-            function updateResultsPerPage() {
-                var selectElement = document.querySelector('.form-select');
-                var selectedOption = selectElement.options[selectElement.selectedIndex].value;
-                
-                // Get the current URL
-                var url = window.location.href;
-                
-                // Split the URL into base and query string parts
-                var parts = url.split('?');
-                var base = parts[0];
-                var query = parts[1] || '';
-                
-                // Split the query string into individual parameter=value pairs
-                var params = query.split('&');
-                var newParams = [];
-                
-                // Replace the limit parameter value with the selected option value
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i].split('=');
-                    if (param[0] === 'limit') {
-                        newParams.push('limit=' + selectedOption);
-                    } else {
-                        newParams.push(params[i]);
-                    }
-                }
-                
-                // If the limit parameter wasn't found, add it to the end of the query string
-                if (newParams.indexOf('limit=' + selectedOption) === -1) {
-                    newParams.push('limit=' + selectedOption);
-                }
-                
-                // Combine the base URL and the new query string
-                var newUrl = base + '?' + newParams.join('&');
-                
-                // Redirect the browser to the new URL
-                window.location.href = newUrl;
-            }
-
 
         </script>
 

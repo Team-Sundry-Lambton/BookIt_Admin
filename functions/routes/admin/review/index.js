@@ -13,19 +13,15 @@ app.use(session({
 const path = require('path');
 const rootFolder = process.cwd();
 const {
-  getAllServices,
-  deleteService,
-  approveService
-} = require(path.join(rootFolder, "/controllers/admin/serviceController"));
+  getAllReviews
+} = require(path.join(rootFolder, "/controllers/admin/reviewController"));
 
 const {
   getListVendors
 } = require(path.join(rootFolder, "/controllers/admin/vendorController"));
-
 const {
-  getListCategories
-} = require(path.join(rootFolder, "/controllers/admin/categoryController"));
-
+  getListClients
+} = require(path.join(rootFolder, "/controllers/admin/clientController"));
 
 // Middleware to check if the user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -50,30 +46,31 @@ app.get('/',isLoggedIn, async (req,res) =>{
     searchByVendor = "";
   }
 
-  var searchByCategory = req.query.category || "";
-  if(searchByCategory == "all"){
-    searchByCategory = "";
+  var searchByClient = req.query.category || "";
+  if(searchByClient == "all"){
+    searchByClient = "";
   }
   
   console.log("searchByVendor: ", searchByVendor);
-  console.log("searchByCategory: ", searchByCategory);
+  console.log("searchByClient: ", searchByClient);
 
   var page = parseInt(req.query.page) || 1;
   var limit = parseInt(req.query.limit) || global.perPage;
-  const data = await getAllServices(searchByVendor, searchByCategory, limit, page);
+  const data = await getAllReviews(searchByVendor, searchByClient, limit, page);
+  console.log("review:", data.results);
   const vendors = await getListVendors();
-  const categories = await getListCategories();
+  const clients = await getListClients();
   
-  res.render('./admin/service/index',{
+  res.render('./admin/review/index',{
       adminUser, 
       currentUrl, 
-      pageName: "Services",
+      pageName: "Reviews",
       title: global.title,
       breadcrumbs: req.breadcrumbs,
       searchByVendor: searchByVendor,
-      searchByCategory: searchByCategory,
+      searchByClient: searchByClient,
       vendors: vendors,
-      categories: categories,
+      clients: clients,
       data: data.results,
       total: data.totalCount,
       next: data.next,
@@ -83,10 +80,5 @@ app.get('/',isLoggedIn, async (req,res) =>{
       prevPage: page-1
   });
 });
-
-app.post('/delete', isLoggedIn, deleteService);
-app.post('/approve', isLoggedIn, approveService);
-
-  
 
 module.exports = app

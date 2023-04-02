@@ -160,7 +160,7 @@ const deleteService = async (req, res, next) => {
   try {
     const id = req.body.categoryId;
     console.log("Deleting category= %s", id);
-    const deleteResult = categoriesCollection.doc(id).delete()
+    const deleteResult = dbCollection.doc(id).delete()
       .then(function() {
         console.log("Document successfully deleted!");
         res.redirect('/admin/category/index');
@@ -172,18 +172,25 @@ const deleteService = async (req, res, next) => {
 };
 
 
-async function getMaxItemOrderOfCategories() {
+const approveService = async (req, res, next) => {
   try {
-    const querySnapshot = await categoriesCollection.orderBy('item_order', 'desc').limit(1).get();
-    const maxOrderDoc = querySnapshot.docs[0];
-    const maxItemOrder = maxOrderDoc.data().item_order;
-    
-    return maxItemOrder;
-  } catch (err) {
-    console.log('Error getting documents', err);
-    throw err;
+    const id = req.body.serviceId;
+    const data = req.body;
+    console.log("Approve service id= %s", data);
+    const service = await dbCollection.doc(id);
+    const updateResult = service.update({
+      accepted: true
+    })
+      .then(function() {
+        console.log("Document successfully updated!");
+        res.redirect('/admin/service/index');
+      })
+      .catch(function(error) {console.error("Error approving document: ", error);});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
   }
-}
+};
+
 
 module.exports = {
   addService,
@@ -191,5 +198,5 @@ module.exports = {
   getService,
   updateService,
   deleteService,
-  //getMaxItemOrderOfCategories
+  approveService
 };

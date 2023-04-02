@@ -8,7 +8,7 @@ const dbCollection = admin.firestore().collection('service');
 const mediaCollection = admin.firestore().collection('media');
 const addressCollection = admin.firestore().collection('address');
 
-async function getAllServices(searchByVendor, searchByCategory, limit, page) {
+async function getAllServices(searchByVendor, searchByCategory, searchByStatus, limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
     let query = dbCollection.orderBy('serviceId', 'desc');
@@ -20,6 +20,13 @@ async function getAllServices(searchByVendor, searchByCategory, limit, page) {
     } else if (searchByVendor && searchByCategory) {
       query = dbCollection.where('parentVendor', '==', searchByVendor).where('parentCategory', '==', searchByCategory);
     }
+
+    if (searchByStatus) {
+      query = dbCollection.where('status', '==', searchByStatus);
+      searchByVendor = "";
+      searchByCategory = "";
+    }
+    
 
     const querySnapshot = await query.limit(limit).get();
     const results = [];
@@ -179,7 +186,7 @@ const approveService = async (req, res, next) => {
     console.log("Approve service id= %s", data);
     const service = await dbCollection.doc(id);
     const updateResult = service.update({
-      accepted: true
+      status: data.status
     })
       .then(function() {
         console.log("Document successfully updated!");

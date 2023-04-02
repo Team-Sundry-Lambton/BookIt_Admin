@@ -218,18 +218,14 @@
                                                 <div class="font-medium">Status</div>
                                                 <div class="ml-2 px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">Required</div>
                                             </div>
-                                            <div class="leading-relaxed text-slate-500 text-xs mt-3">
-                                                If the status is active, your product can be searched for by potential buyers.
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
-                                        <div class="form-check form-switch">
-                                            <input id="item-status-active" name="accepted" class="form-check-input" type="checkbox" {{#if service.accepted}}checked{{/if}}>
-                                            <label class="form-check-label" for="item-status-active">
-                                                <span id="status-text">{{#if service.accepted}}Yes{{else}}No{{/if}}</span>
-                                            </label>
-                                        </div>
+                                        <select id="status" class="form-select" name="status">
+                                            <option {{#ifCond service.status '===' "Accepted"}} selected {{/ifCond}} value="Accepted">Accepted</option>
+                                            <option {{#ifCond service.status '===' "Rejected"}} selected {{/ifCond}} value="Rejected">Rejected</option>
+                                            <option {{#ifCond service.status '===' "Pending"}} selected {{/ifCond}} value="Pending">Pending</option>
+                                        </select>
                                     </div>
                                 </div>
                                 <div class="form-inline items-start flex-col xl:flex-row mt-5 pt-5 first:mt-0 first:pt-0">

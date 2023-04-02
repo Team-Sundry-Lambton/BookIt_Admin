@@ -270,3 +270,15 @@ Handlebars.registerHelper('ifUrlIncludes', function(v1, v2, options) {
     return options.inverse(this);
   }
 });
+
+Handlebars.registerHelper('range', function(start, end, options) {
+  var result = '';
+  for (var i = start; i <= end; i++) {
+    result += options.fn(i);
+  }
+  return result;
+});
+
+Handlebars.registerHelper('subtract', function(a, b) {
+  return a - b;
+});

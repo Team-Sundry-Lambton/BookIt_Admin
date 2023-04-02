@@ -4,7 +4,6 @@
                 <h2 class="intro-y text-lg font-medium mt-10">{{pageName}}</h2>
         <div class="grid grid-cols-12 gap-6 mt-5">
         <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-            <button class="btn btn-primary shadow-md mr-2" onclick="add()"><i data-lucide="plus" class="w-4 h-4 mr-2"></i>Add service</button>
             <form class="w-full xl:w-auto flex items-center mt-3 xl:mt-0" id="filter-form" action="/admin/service/index" method="get">
                     <select id="parentVendor" class="form-select box ml-2" name="vendor">
                         <option value="all" {{#ifCond searchByVendor '===' ""}} selected {{/ifCond}}>All vendors</option>
@@ -12,10 +11,10 @@
                         <option value="{{this.email}}" {{#ifCond ../searchByVendor '===' this.email}} selected {{/ifCond}}>{{this.firstName}} {{this.lastName}} ({{this.email}})</option>
                         {{/each}}
                     </select>
-                    <select id="parentCategory" class="form-select box ml-2" name="category">
-                        <option value="all" {{#ifCond searchByCategory '===' ""}} selected {{/ifCond}}>All category</option>
-                        {{#each categories}}
-                        <option value="{{this.name}}" {{#ifCond ../searchByCategory '===' this.name}} selected {{/ifCond}}>{{this.name}}</option>
+                    <select id="parentClient" class="form-select box ml-2" name="client">
+                        <option value="all" {{#ifCond searchByClient '===' ""}} selected {{/ifCond}}>All clients</option>
+                        {{#each clients}}
+                        <option value="{{this.email}}" {{#ifCond ../searchByClient '===' this.email}} selected {{/ifCond}}>{{this.firstName}} {{this.lastName}} ({{this.email}})</option>
                         {{/each}}
                     </select>
             </form>
@@ -32,12 +31,11 @@
             <table class="table table-report -mt-2">
                 <thead>
                     <tr>
-                        <th class="whitespace-nowrap">Picture</th>
-                        <th class="whitespace-nowrap">Title</th>
-                        <th class="whitespace-nowrap">Price</th>
-                        <th class="whitespace-nowrap">Equipment</th>
-                        <th class="whitespace-nowrap">Cancel Policy</th>
-                        <th class="whitespace-nowrap">Accepted</th>
+                        <th class="whitespace-nowrap">Service Title</th>
+                        <th class="whitespace-nowrap">Vendor</th>
+                        <th class="whitespace-nowrap">Client</th>
+                        <th class="whitespace-nowrap">Rating</th>
+                        <th class="whitespace-nowrap">Date</th>
                         <th class="text-center whitespace-nowrap">ACTIONS</th>
                     </tr>
                 </thead>
@@ -47,45 +45,27 @@
                         
                         <td class="w-40">
                             <div class="flex">
-                                {{#each this.medias}}
-                                <div class="w-10 h-10 image-fit zoom-in">
-                                    <img alt="" class="rounded-full" src="{{this.mediaPath}}" title=""> 
-                                </div>
-                                {{/each}}
+                                $ {{this.service.serviceTitle}}
                             </div>
                         </td>
-                        <td>
-                            <a href="/admin/service/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.serviceTitle}}</a><br/>
-                            Vendor: <a href="/admin/service/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.parentVendor}}</a><br/>
-                            Category: <a href="/admin/service/edit/{{this.id}}" class="font-medium whitespace-nowrap">{{this.parentCategory}}</a><br/>
-                            <a target="_blank" class="flex items-center text-danger deleteRecord" href="https://www.google.com/maps?q={{this.location.latitude}},{{this.location.longitude}}" title="{{this.location.address}}">
-                                <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i> View on Maps
-                            </a>
-                            {{!-- {{this.serviceDescription}} --}}
-                        </td>
-                        <td>
-                            $ {{this.price}}/ {{this.priceType}}
-                        </td>
                         <td class="w-40">
-                            <div class="flex items-center justify-center {{#ifCond this.equipment '==' true}} text-success {{else}} text-danger{{/ifCond}}">
-                                <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> {{#ifCond this.equipment '==' true}} Yes {{else}} No{{/ifCond}}
+                            <div class="flex">
+                                $ {{this.vendor.firstName}}
                             </div>
                         </td>
-                        
-                        <td>
-                            {{this.cancelPolicy}}
+                        <td class="w-40">
+                            <div class="flex">
+                                $ {{this.client.firstName}}
+                            </div>
                         </td>
                         <td class="w-40">
-                            <div class="form-check form-switch">
-                                {{#if this.accepted}}
-                                    <div class="flex items-center justify-center text-success">
-                                        <i data-lucide="check-square" class="w-4 h-4 mr-2"></i> Accepted
-                                    </div>
-                                {{else}}
-                                    <a class="flex items-center text-danger approveService" href="javascript:;" data-tw-toggle="modal" data-id="{{this.id}}" data-tw-target="#approve-confirmation-modal">
-                                        <i data-lucide="check-square" class="w-4 h-4 mr-1"></i> Accept now?
-                                    </a>
-                                {{/if}}
+                            <div class="flex">
+                                $ {{this.service.serviceTitle}}
+                            </div>
+                        </td>
+                        <td class="w-40">
+                            <div class="flex">
+                                $ {{this.service.serviceTitle}}
                             </div>
                         </td>
                         <td class="table-report__action w-56">
@@ -142,6 +122,13 @@
                     
                 </ul>
             </nav>
+            {{!-- <select class="w-20 form-select box mt-3 sm:mt-0" onchange="updateResultsPerPage()">
+                <option>4</option>
+                <option>10</option>
+                <option>25</option>
+                <option>35</option>
+                <option>50</option>
+            </select> --}}
         </div>
         <!-- END: Pagination -->
     </div>
@@ -154,33 +141,13 @@
                 <div class="p-5 text-center">
                     <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i>
                     <div class="text-3xl mt-5">Are you sure?</div>
-                    <div class="text-slate-500 mt-2">Do you really want to delete this service? <br>This process cannot be undone.</div>
+                    <div class="text-slate-500 mt-2">Do you really want to delete this record? <br>This process cannot be undone.</div>
                 </div>
                 <div class="px-5 pb-8 text-center">
                     <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
                     <button type="submit" class="btn btn-danger w-24">Delete</button>
                 </div>
                 <input type="hidden" name="adminId" id="adminIdInput">
-                </div>
-            </form>
-            </div>
-        </div>
-    </div>
-    <div id="approve-confirmation-modal" class="modal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <form id="delete-form" action="/admin/service/index/approve" method="POST">
-                <div class="modal-body p-0">
-                <div class="p-5 text-center">
-                    <i data-lucide="x-circle" class="w-16 h-16 text-danger mx-auto mt-3"></i>
-                    <div class="text-3xl mt-5">Are you sure?</div>
-                    <div class="text-slate-500 mt-2">Do you want to approve this service?</div>
-                </div>
-                <div class="px-5 pb-8 text-center">
-                    <button type="button" data-tw-dismiss="modal" class="btn btn-outline-secondary w-24 mr-1">Cancel</button>
-                    <button type="submit" class="btn btn-danger w-24">Yes</button>
-                </div>
-                <input type="hidden" name="serviceId" id="serviceIdInput">
                 </div>
             </form>
             </div>
@@ -201,17 +168,45 @@
                 });
             });
 
-            document.querySelectorAll('.approveService').forEach((deleteBtn) => {
-                deleteBtn.addEventListener('click', () => {
-                    const serviceId = deleteBtn.dataset.id;
-                    document.getElementById('serviceIdInput').value = serviceId;
-                });
-            });
+            function updateResultsPerPage() {
+                var selectElement = document.querySelector('.form-select');
+                var selectedOption = selectElement.options[selectElement.selectedIndex].value;
+                
+                // Get the current URL
+                var url = window.location.href;
+                
+                // Split the URL into base and query string parts
+                var parts = url.split('?');
+                var base = parts[0];
+                var query = parts[1] || '';
+                
+                // Split the query string into individual parameter=value pairs
+                var params = query.split('&');
+                var newParams = [];
+                
+                // Replace the limit parameter value with the selected option value
+                for (var i = 0; i < params.length; i++) {
+                    var param = params[i].split('=');
+                    if (param[0] === 'limit') {
+                        newParams.push('limit=' + selectedOption);
+                    } else {
+                        newParams.push(params[i]);
+                    }
+                }
+                
+                // If the limit parameter wasn't found, add it to the end of the query string
+                if (newParams.indexOf('limit=' + selectedOption) === -1) {
+                    newParams.push('limit=' + selectedOption);
+                }
+                
+                // Combine the base URL and the new query string
+                var newUrl = base + '?' + newParams.join('&');
+                
+                // Redirect the browser to the new URL
+                window.location.href = newUrl;
+            }
 
 
-
-
-           
             document.addEventListener('DOMContentLoaded', function() {
                 var form = document.querySelector('#filter-form');
                

@@ -109,6 +109,14 @@ app.use("/admin/booking/add", adminAddBookingRouter);
 app.use("/admin/booking/edit", adminEditBookingRouter);
 app.use("/admin/booking/invoice", adminInvoiceRouter);
 
+//review page
+const adminReviewRouter = require("./routes/admin/review/index");
+const adminAddReviewRouter = require("./routes/admin/review/add");
+const adminEditReviewRouter = require("./routes/admin/review/edit");
+app.use("/admin/review/index", adminReviewRouter);
+app.use("/admin/review/add", adminAddReviewRouter);
+app.use("/admin/review/edit", adminEditReviewRouter);
+
 const apiRouter = require("./routes/admin/api");
 app.use("/admin/api", apiRouter);
 

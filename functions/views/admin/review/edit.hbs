@@ -225,9 +225,9 @@
                                     </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1">
                                         <div class="form-check form-switch">
-                                            <input id="item-status-active" name="accepted" class="form-check-input" type="checkbox" {{#if service.accepted}}checked{{/if}}>
+                                            <input id="item-status-active" name="status" class="form-check-input" type="checkbox" {{#if service.status}}checked{{/if}}>
                                             <label class="form-check-label" for="item-status-active">
-                                                <span id="status-text">{{#if service.accepted}}Yes{{else}}No{{/if}}</span>
+                                                <span id="status-text">{{#if service.status}}Active{{else}}Inactive{{/if}}</span>
                                             </label>
                                         </div>
                                     </div>

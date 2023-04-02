@@ -5,6 +5,7 @@ const config = require(path.join(rootFolder, "/config/db"));;
 const admin = require('firebase-admin');
 
 const dbCollection = admin.firestore().collection('client');
+const reviewCollection = admin.firestore().collection('vendorReview');
 
 
 async function getListClients() {
@@ -39,7 +40,29 @@ async function getAllClients(limit, page) {
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      let parentData = null;
+
+      try {
+        const queryReviewSnapshot = await reviewCollection
+                                          .where('clientEmailAddress', '==', data.email)
+                                          .where('vendorRating', '==', false)
+                                          .get();
+        if (!queryReviewSnapshot.empty) {
+          var totalRating = 0;
+          var totalReview = queryReviewSnapshot.docs.length;
+          for (const doc of queryReviewSnapshot.docs) {
+            const datas = doc.data();
+            totalRating += datas.rating
+          }
+          data.rating = totalRating/totalReview;
+        } else {
+          data.rating = 0;
+        }
+      } catch (error) {
+        console.error(error);
+        data.rating = 0;
+      }
+
+
       results.push({
         id: doc.id,
         ...data,

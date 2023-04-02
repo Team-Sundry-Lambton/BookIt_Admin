@@ -6,6 +6,7 @@ const admin = require('firebase-admin');
 
 const dbCollection = admin.firestore().collection('vendor');
 const accountCollection = admin.firestore().collection('account');
+const reviewCollection = admin.firestore().collection('vendorReview');
 
 
 async function getListVendors() {
@@ -52,6 +53,27 @@ async function getAllVendors(limit, page) {
       } catch (error) {
         console.error(error);
         account = null;
+      }
+      
+      try {
+        const queryReviewSnapshot = await reviewCollection
+                                          .where('vendorEmailAddress', '==', data.email)
+                                          .where('vendorRating', '==', true)
+                                          .get();
+        if (!queryReviewSnapshot.empty) {
+          var totalRating = 0;
+          var totalReview = queryReviewSnapshot.docs.length;
+          for (const doc of queryReviewSnapshot.docs) {
+            const datas = doc.data();
+            totalRating += datas.rating
+          }
+          data.rating = totalRating/totalReview;
+        } else {
+          data.rating = 0;
+        }
+      } catch (error) {
+        console.error(error);
+        data.rating = 0;
       }
 
       results.push({

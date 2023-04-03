@@ -13,7 +13,7 @@ hbs.registerHelper('xif', xifHelper);
 global.title = "BookIt";
 app.set('views','./views');
 app.set('view engine', 'hbs');
-global.perPage = 30;
+global.perPage = 8;
 
 // Serve static files from the public directory
 app.use(express.static('public'));

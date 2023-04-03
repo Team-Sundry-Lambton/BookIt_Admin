@@ -97,31 +97,33 @@
                 <ul class="pagination">
                     {{#ifCond currentPage '!==' 1}}
                     <li class="page-item">
-                        <a class="page-link" href="/admin/service/index">
+                        <a class="page-link" href="/admin/review/index">
                             <i class="w-4 h-4" data-lucide="chevrons-left"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/admin/service/index?page={{prevPage}}">
+                        <a class="page-link" href="/admin/review/index?page={{prevPage}}">
                             <i class="w-4 h-4" data-lucide="chevron-left"></i>
                         </a>
                     </li>
                     {{/ifCond}}
 
-                    {{#times pages}}
-                        <li class="page-item">
-                            <a class="page-link" href="/admin/service/index?page={{this}}">{{this}}</a>
-                        </li>
-                    {{/times}}
+                    {{#ifCond pages '>' 1}}
+                        {{#times pages}}
+                            <li class="page-item">
+                                <a class="page-link" href="/admin/review/index?page={{this}}">{{this}}</a>
+                            </li>
+                        {{/times}}
+                    {{/ifCond}}
 
                     {{#ifCond pages '!==' currentPage}}
                     <li class="page-item">
-                        <a class="page-link" href="/admin/service/index?page={{nextPage}}">
+                        <a class="page-link" href="/admin/review/index?page={{nextPage}}">
                             <i class="w-4 h-4" data-lucide="chevron-right"></i>
                         </a>
                     </li>
                     <li class="page-item">
-                        <a class="page-link" href="/admin/service/index?page={{pages}}">
+                        <a class="page-link" href="/admin/review/index?page={{pages}}">
                             <i class="w-4 h-4" data-lucide="chevrons-right"></i>
                         </a>
                     </li>

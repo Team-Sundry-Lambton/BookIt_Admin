@@ -105,11 +105,13 @@
                     </li>
                     {{/ifCond}}
 
-                    {{#times pages}}
-                        <li class="page-item">
-                            <a class="page-link" href="/admin/booking/index?page={{this}}">{{this}}</a>
-                        </li>
-                    {{/times}}
+                    {{#ifCond pages '>' 1}}
+                        {{#times pages}}
+                            <li class="page-item">
+                                <a class="page-link" href="/admin/booking/index?page={{this}}">{{this}}</a>
+                            </li>
+                        {{/times}}
+                    {{/ifCond}}
 
                     {{#ifCond pages '!==' currentPage}}
                     <li class="page-item">
@@ -126,13 +128,6 @@
                     
                 </ul>
             </nav>
-            {{!-- <select class="w-20 form-select box mt-3 sm:mt-0" onchange="updateResultsPerPage()">
-                <option>4</option>
-                <option>10</option>
-                <option>25</option>
-                <option>35</option>
-                <option>50</option>
-            </select> --}}
         </div>
         <!-- END: Pagination -->
     </div>
@@ -171,45 +166,6 @@
                     document.getElementById('adminIdInput').value = adminId;
                 });
             });
-
-            function updateResultsPerPage() {
-                var selectElement = document.querySelector('.form-select');
-                var selectedOption = selectElement.options[selectElement.selectedIndex].value;
-                
-                // Get the current URL
-                var url = window.location.href;
-                
-                // Split the URL into base and query string parts
-                var parts = url.split('?');
-                var base = parts[0];
-                var query = parts[1] || '';
-                
-                // Split the query string into individual parameter=value pairs
-                var params = query.split('&');
-                var newParams = [];
-                
-                // Replace the limit parameter value with the selected option value
-                for (var i = 0; i < params.length; i++) {
-                    var param = params[i].split('=');
-                    if (param[0] === 'limit') {
-                        newParams.push('limit=' + selectedOption);
-                    } else {
-                        newParams.push(params[i]);
-                    }
-                }
-                
-                // If the limit parameter wasn't found, add it to the end of the query string
-                if (newParams.indexOf('limit=' + selectedOption) === -1) {
-                    newParams.push('limit=' + selectedOption);
-                }
-                
-                // Combine the base URL and the new query string
-                var newUrl = base + '?' + newParams.join('&');
-                
-                // Redirect the browser to the new URL
-                window.location.href = newUrl;
-            }
-
 
             document.addEventListener('DOMContentLoaded', function() {
                 var form = document.querySelector('#filter-form');

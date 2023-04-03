@@ -64,6 +64,7 @@ app.get('/',isLoggedIn, async (req,res) =>{
   const data = await getAllBookings(searchByVendor, searchByCategory,searchByStatus, limit, page);
   const vendors = await getListVendors();
   const categories = await getListCategories();
+  const pages = Math.ceil(data.totalCount / limit);
   res.render('./admin/booking/index',{
       adminUser, 
       currentUrl, 
@@ -78,7 +79,7 @@ app.get('/',isLoggedIn, async (req,res) =>{
       data: data.results,
       total: data.totalCount,
       next: data.next,
-      pages: Math.ceil(data.totalCount / limit),
+      pages: pages,
       currentPage: page,
       nextPage: page+1,
       prevPage: page-1

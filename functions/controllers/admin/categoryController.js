@@ -17,16 +17,9 @@ async function getListCategories() {
     const results = [];
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      /* const parentId = data.parent_id;
-      let parentData = null;
-      if (parentId != "") {
-        const parentDoc = await dbCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      } */
       results.push({
         id: doc.id,
-        ...data,
-        //parent_cat: parentData,
+        ...data
       });
     }
     return results;
@@ -35,11 +28,12 @@ async function getListCategories() {
     throw err;
   }
 }
+
 async function getAllCategories(limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('name', 'asc');
-    
+    let query = dbCollection.orderBy('name', 'desc');
+
     if (startAfter) {
       query = query.startAfter(startAfter);
     }
@@ -49,30 +43,21 @@ async function getAllCategories(limit, page) {
 
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
-      /*
-      const parentId = data.parent_id;
-      let parentData = null;
-
-      if (parentId != "") {
-        const parentDoc = await dbCollection.doc(parentId).get();
-        parentData = parentDoc.data();
-      } */
-
       results.push({
         id: doc.id,
-        ...data,
-        //parent_cat: parentData,
+        ...data
       });
     }
 
     const totalResults = await dbCollection.get();
     const totalCount = totalResults.docs.length;
     const next = querySnapshot.docs.length === limit ? querySnapshot.docs[limit - 1].id : null;
+    console.log("next:", next)
 
     return {
       results,
       next: next,
-      totalCount
+      totalCount,
     };
   } catch (err) {
     console.log('Error getting documents', err);
@@ -80,7 +65,17 @@ async function getAllCategories(limit, page) {
   }
 }
 
-
+async function getMaxId() {
+  try {
+    const querySnapshot = await dbCollection.orderBy('categoryId', 'desc').limit(1).get();
+    const maxIdDoc = querySnapshot.docs[0];
+    const maxId = maxIdDoc.data().categoryId;
+    return maxId;
+  } catch (err) {
+    console.log('Error getting documents', err);
+    throw err;
+  }
+}
 
 const addCategory = async (req, res, next) => {
   try {
@@ -88,7 +83,10 @@ const addCategory = async (req, res, next) => {
     const data = req.body;
     data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
     data.status = data.status == "on" ? true : false;
+    var maxId = await getMaxId();
+    const categoryId = maxId + 1;
     const writeResult = await dbCollection.add({
+      categoryId: categoryId,
       name: data.name,
       picture: data.picture,
       description: data.description,

@@ -14,13 +14,15 @@ const addressCollection = admin.firestore().collection('address');
 async function getAllBookings(searchByVendor, searchByCategory, searchByStatus, limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('date', 'desc');
+    let query = dbCollection.orderBy('bookingId', 'asc');
 
     if (searchByStatus) {
       query = dbCollection.where('status', '==', searchByStatus);
     }
 
-
+    if (startAfter) {
+      query = query.startAfter(startAfter);
+    }
     const querySnapshot = await query.limit(limit).get();
     const results = [];
 

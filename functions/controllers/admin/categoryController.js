@@ -32,7 +32,7 @@ async function getListCategories() {
 async function getAllCategories(limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('name', 'desc');
+    let query = dbCollection.orderBy('categoryId', 'desc');
 
     if (startAfter) {
       query = query.startAfter(startAfter);

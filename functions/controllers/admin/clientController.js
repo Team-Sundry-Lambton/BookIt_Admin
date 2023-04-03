@@ -10,7 +10,7 @@ const reviewCollection = admin.firestore().collection('vendorReview');
 
 async function getListClients() {
   try {
-    const querySnapshot = await dbCollection.orderBy('firstName', 'asc').get();
+    const querySnapshot = await dbCollection.orderBy('clientId', 'asc').get();
     const results = [];
     for (const doc of querySnapshot.docs) {
       const data = doc.data();
@@ -142,6 +142,18 @@ const updateClient = async (req, res, next) => {
   }
 };
 
+async function getMaxId() {
+  try {
+    const querySnapshot = await dbCollection.orderBy('clientId', 'desc').limit(1).get();
+    const maxIdDoc = querySnapshot.docs[0];
+    const maxId = maxIdDoc.data().clientId;
+    return maxId;
+  } catch (err) {
+    console.log('Error getting documents', err);
+    throw err;
+  }
+}
+
 const addClient = async (req, res, next) => {
   try {
     console.log("Adding new client");
@@ -150,7 +162,10 @@ const addClient = async (req, res, next) => {
     data.status = data.status == "on" ? true : false;
     data.isPremium = data.isPremium == "on" ? true : false;
     data.created_date = Math.floor(Date.now() / 1000);
+    var maxId = await getMaxId();
+    const clientId = maxId + 1;
     const writeResult = await dbCollection.add({
+      clientId: clientId,
       contactNumber: data.contactNumber,
       email: data.email,
       firstName: data.firstName,

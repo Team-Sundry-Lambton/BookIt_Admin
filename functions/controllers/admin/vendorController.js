@@ -149,6 +149,17 @@ const getVendor = async (id) => {
   }
 };
 
+async function getMaxId() {
+  try {
+    const querySnapshot = await dbCollection.orderBy('vendorId', 'desc').limit(1).get();
+    const maxIdDoc = querySnapshot.docs[0];
+    const maxId = maxIdDoc.data().vendorId;
+    return maxId;
+  } catch (err) {
+    console.log('Error getting documents', err);
+    throw err;
+  }
+}
 
 const addVendor = async (req, res, next) => {
   try {
@@ -157,7 +168,10 @@ const addVendor = async (req, res, next) => {
     data.picture = "https://media.istockphoto.com/id/465466108/photo/cn-tower-toronto-cityscape-on-lake-ontario.jpg?b=1&s=170667a&w=0&k=20&c=nFPW1Gi2uQfbkkVM5oOZwD9n_Qy3gtcIkdISh8e8PAA="
     data.status = data.status == "on" ? true : false;
     data.created_date = Math.floor(Date.now() / 1000);
+    var maxId = await getMaxId();
+    const vendorId = maxId + 1;
     const writeResult = await dbCollection.add({
+      vendorId: vendorId,
       contactNumber: data.contactNumber,
       email: data.email,
       firstName: data.firstName,

@@ -124,11 +124,13 @@
                     </li>
                     {{/ifCond}}
 
-                    {{#times pages}}
-                        <li class="page-item">
-                            <a class="page-link" href="/admin/service/index?page={{this}}">{{this}}</a>
-                        </li>
-                    {{/times}}
+                    {{#ifCond pages '>' 1}}
+                        {{#times pages}}
+                            <li class="page-item">
+                                <a class="page-link" href="/admin/service/index?page={{this}}">{{this}}</a>
+                            </li>
+                        {{/times}}
+                    {{/ifCond}}
 
                     {{#ifCond pages '!==' currentPage}}
                     <li class="page-item">

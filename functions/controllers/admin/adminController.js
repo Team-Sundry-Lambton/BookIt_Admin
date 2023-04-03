@@ -11,7 +11,7 @@ const dbCollection = admin.firestore().collection('admins');
 async function getAllAdmins(limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('firstname', 'asc');
+    let query = dbCollection.orderBy('adminId', 'asc');
     
     if (startAfter) {
       query = query.startAfter(startAfter);

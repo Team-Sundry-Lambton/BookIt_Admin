@@ -28,6 +28,7 @@ async function getListClients() {
 }
 async function getAllClients(limit, page) {
   try {
+    const limit = 20;
     const startAfter = page ? (page-1) * limit : null;
     let query = dbCollection.orderBy('firstName', 'asc');
     

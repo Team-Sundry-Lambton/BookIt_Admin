@@ -167,41 +167,23 @@
                     <div class="intro-y box p-5">
                         <div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
                             <div class="font-medium text-base flex items-center border-b border-slate-200/60 dark:border-darkmode-400 pb-5">
-                                <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Upload Photo
+                                <i data-lucide="chevron-down" class="w-4 h-4 mr-2"></i> Photos
                             </div>
                             <div class="mt-5">
                                 <div class="form-inline items-start flex-col xl:flex-row mt-10">
-                                    <div class="form-label w-full xl:w-64 xl:!mr-10">
-                                        <div class="text-left">
-                                            <div class="flex items-center">
-                                                <div class="font-medium">Photos</div>
-                                            </div>
-                                            <div class="leading-relaxed text-slate-500 text-xs mt-3">
-                                                <div>The image format is .jpg .jpeg .png and a minimum size of 300 x 300 pixels (For optimal images use a minimum size of 700 x 700 pixels).</div>
-                                                <div class="mt-2">Select product photos or drag and drop up to 5 photos at once here. Include min. 3 attractive photos to make the product more attractive to buyers.</div>
-                                            </div>
-                                        </div>
-                                    </div>
                                     <div class="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
-                                        <div class="w-52 mx-auto xl:mr-0 xl:ml-6">
-                                            <div class="border-2 border-dashed shadow-sm border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
-                                                <div class="h-40 relative image-fit cursor-pointer zoom-in mx-auto">
-                                                    <img id="picture" class="rounded-md" alt="" src="{{service.picture}}">
-                                                    <div title="Remove this profile photo?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2">
-                                                        <i data-lucide="x" class="w-4 h-4"></i>
-                                                    </div>
-                                                </div>
-                                                <div class="mx-auto cursor-pointer relative mt-5">
-                                                    <button id="change-photo-btn" type="button" class="btn btn-primary w-full">Select Photo</button>
-                                                    <input id="file" name="picture" type="file" class="w-full h-full top-0 left-0 absolute opacity-0">
-                                                </div>
+                                        <div class="grid grid-cols-10 gap-5 pl-4 pr-5">
+                                            {{#each medias}}
+                                            <div class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer zoom-in">
+                                                <img class="rounded-md" alt="" src="{{this.mediaPath}}">
                                             </div>
+                                            {{/each}}
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                        </div>
                     <!-- END: Upload Product -->
                     
                     <!-- BEGIN: Product Management -->

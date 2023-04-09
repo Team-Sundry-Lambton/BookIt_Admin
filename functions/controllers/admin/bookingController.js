@@ -14,7 +14,7 @@ const addressCollection = admin.firestore().collection('address');
 async function getAllBookings(searchByVendor, searchByCategory, searchByStatus, limit, page) {
   try {
     const startAfter = page ? (page-1) * limit : null;
-    let query = dbCollection.orderBy('bookingId', 'asc');
+    let query = dbCollection.orderBy('bookingId', 'desc');
 
     if (searchByStatus) {
       query = dbCollection.where('status', '==', searchByStatus);
@@ -184,7 +184,7 @@ const getBooking = async (id) => {
       return null;
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    //res.status(400).json({ message: error.message });
   }
 };
 

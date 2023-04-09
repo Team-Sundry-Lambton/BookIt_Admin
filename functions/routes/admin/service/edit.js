@@ -45,8 +45,12 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
     var adminUser = req.session.user;
     var currentUrl = req.originalUrl;
     const id = req.params.id;
-    var service = await getService(id);
-    console.log(service);
+    var results = await getService(id);
+    //console.log(results);
+    console.log(results.service);
+    console.log(results.medias);
+    var service = results.service;
+    var medias = results.medias;
     var categories = await getListCategories();
     var vendors = await getListVendors();
     res.render('./admin/service/edit',{
@@ -57,6 +61,7 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
         breadcrumbs: req.breadcrumbs,
         id: id,
         service,
+        medias,
         vendors,
         categories
     });

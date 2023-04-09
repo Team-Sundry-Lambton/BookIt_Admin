@@ -53,6 +53,46 @@ app.post('/export', async (req, res) => {
     //res.json(bookingId);
   });
 
+app.post('/email/send/', async (req, res) => {
+    try {
+        const bookingId = req.body.bookingId;
+        var data = await getBooking(bookingId);
+        data = data[0];
+        email = data.client.email;
+        emailCC = data.vendor.email;
+        subject =  'Invoice #' + data.service.serviceId;
+        content =  generateInvoiceContent(bookingId, data);
+
+        //exportPDF(bookingId, data, res);
+        const myAccessTokenObject = await myOAuth2Client.getAccessToken()
+        const myAccessToken = myAccessTokenObject?.token
+        const transport = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            type: 'OAuth2',
+            user: ADMIN_EMAIL_ADDRESS,
+            clientId: GOOGLE_MAILER_CLIENT_ID,
+            clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
+            refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+            accessToken: myAccessToken
+        }
+        })
+        const mailOptions = {
+            to: email,
+            cc: emailCC,
+            subject: subject,
+            html: content,
+            headers: {
+                'Content-Type': 'text/html'
+            }
+        };
+        //await transport.sendMail(mailOptions)
+        res.status(200).json({ message: 'Email sent successfully.' })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ errors: error.message })
+    }
+})
 
 app.post('/email/send/:id', async (req, res) => {
     try {
@@ -87,7 +127,10 @@ app.post('/email/send/:id', async (req, res) => {
             }
         };
         await transport.sendMail(mailOptions)
-        res.status(200).json({ message: 'Email sent successfully.' })
+        res.status(200).json({ 
+                                result: true,
+                                message: 'Email sent successfully.'
+                             })
     } catch (error) {
         console.log(error)
         res.status(500).json({ errors: error.message })
@@ -533,7 +576,6 @@ app.get('/invoice/export/:id', async (req, res) => {
 });
 
 async function exportPDF(bookingId, data, res){
-    console.log(data);
     const rootPath = path.join(__dirname, '../../../../');
     if(!data.booking.hasOwnProperty('invoiceURL')){
         const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;

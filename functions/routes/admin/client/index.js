@@ -39,7 +39,8 @@ app.get('/',isLoggedIn, async (req,res) =>{
   var adminUser = req.session.user;
   var currentUrl = req.originalUrl;
   var page = parseInt(req.query.page) || 1;
-  var limit = parseInt(req.query.limit) || global.perPage;
+  //var limit = parseInt(req.query.limit) || global.perPage;
+  var limit = parseInt(req.query.limit) || 20;
   const data = await getAllClients(limit,page);
 
   res.render('./admin/client/index',{

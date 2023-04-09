@@ -23,5 +23,9 @@
     "puppeteer": "^19.8.0",
     "puppeteer-core": "^19.8.1",
     "toastify-js": "^1.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.38.0",
+    "eslint-config-google": "^0.14.0"
   }
 }

@@ -96,11 +96,34 @@ async function getAllServices(searchByVendor, searchByCategory, searchByStatus, 
 
 const getService = async (id) => {
   try {
+    const results = [];
     console.log("Getting serviceId= %s", id);
     const data = await dbCollection.doc(id).get();
     const service = data.data();
     if (!service.exists) {
-      return service;
+      try {
+        const queryMediaSnapshot = await mediaCollection.where('parentService', '==', service.serviceId).get();
+        if (!queryMediaSnapshot.empty) {
+          const mediasDoc = queryMediaSnapshot.docs;
+          medias = [];
+          mediasDoc.forEach(doc => {
+            medias.push(doc.data());
+          });
+        } else {
+          medias = null;
+        }
+
+      } catch (error) {
+        console.error(error);
+        medias = null;
+      }
+
+      results.push({
+        medias: medias,
+        service: service
+      });
+
+      return results[0];
     } else {
       return null;
     }

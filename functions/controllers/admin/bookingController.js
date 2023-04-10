@@ -107,6 +107,7 @@ const getBooking = async (id) => {
     console.log("Getting bookingId= %s", id);
     const data = await dbCollection.doc(id).get();
     const booking = data.data();
+    console.log(booking);
     let vendor = null;
     let client = null;
     let service = null;
@@ -188,6 +189,102 @@ const getBooking = async (id) => {
   }
 };
 
+const getBookingByBookingId = async (id) => {
+  try {
+    const result = [];
+    console.log("Getting bookingId= %s", id);
+    try {
+      const querySnapshot = await dbCollection.where('bookingId', '==', parseInt(id)).get();
+      if (!querySnapshot.empty) {
+        const bookingDoc = querySnapshot.docs[0];
+        const booking = bookingDoc.data();
+        let vendor = null;
+        let client = null;
+        let service = null;
+        let address = null;
+        
+        try {
+          const queryServiceSnapshot = await serviceCollection.where('serviceId', '==', booking.parentService).get();
+          if (!queryServiceSnapshot.empty) {
+            const serviceDoc = queryServiceSnapshot.docs[0];
+            service = serviceDoc.data();
+          } else {
+            service = null;
+          }
+        } catch (error) {
+          console.error(error);
+          service = null;
+        }
+
+        try {
+          const queryAddressSnapshot = await addressCollection.where('parentService', '==', service.serviceId).get();
+          if (!queryAddressSnapshot.empty) {
+            const addressDoc = queryAddressSnapshot.docs[0];
+            address = addressDoc.data();
+          } else {
+            address = null;
+          }
+        } catch (error) {
+          console.error(error);
+          address = null;
+        }
+
+        try {
+          const queryVendorSnapshot = await vendorCollection.where('email', '==', booking.vendorEmailAddress).get();
+          if (!queryVendorSnapshot.empty) {
+            const vendorDoc = queryVendorSnapshot.docs[0];
+            vendor = vendorDoc.data();
+          } else {
+            vendor = null;
+          }
+        } catch (error) {
+          console.error(error);
+          vendor = null;
+        }
+
+        try {
+          const queryClientSnapshot = await clientCollection.where('email', '==', booking.clientEmailAddress).get();
+          if (!queryClientSnapshot.empty) {
+            const clientDoc = queryClientSnapshot.docs[0];
+            client = clientDoc.data();
+          } else {
+            client = null;
+          }
+        } catch (error) {
+          console.error(error);
+          client = null;
+        }
+
+        const timestamp = booking.date;
+        const date = new Date(timestamp._seconds * 1000 + timestamp._nanoseconds / 1000000);
+        const timeZone = 'America/New_York';
+        const convertedDate = moment(date).tz(timeZone).format('MMMM DD, YYYY [at] h:mm:ss A');
+        booking.date = convertedDate;
+
+        result.push({
+          booking: booking,
+          vendor: vendor,
+          client: client,
+          service: service,
+          address: address
+        });
+      } else {
+        const booking = null;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    if (!result.exists) {
+      return result;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    //res.status(400).json({ message: error.message });
+  }
+};
+
 
 const updateBooking = async (req, res, next) => {
   console.log('updating cat');
@@ -247,5 +344,6 @@ module.exports = {
   getBooking,
   updateBooking,
   deleteBooking,
-  updateInvoiceBooking
+  updateInvoiceBooking,
+  getBookingByBookingId
 };

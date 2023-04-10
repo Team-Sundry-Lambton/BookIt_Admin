@@ -52,7 +52,7 @@
                                         <select id="booking" class="form-select" name="status">
                                             <option {{#ifCond data.booking.status '===' "New"}} selected {{/ifCond}} value="New">New</option>
                                             <option {{#ifCond data.booking.status '===' "Pending"}} selected {{/ifCond}} value="Pending">Pending</option>
-                                            <option {{#ifCond data.booking.status '===' "In progress"}} selected {{/ifCond}} value="In progress">In progress</option>
+                                            <option {{#ifCond data.booking.status '===' "Inprogress"}} selected {{/ifCond}} value="Inprogress">In progress</option>
                                             <option {{#ifCond data.booking.status '===' "Completed"}} selected {{/ifCond}} value="Completed">Completed</option>
                                             <option {{#ifCond data.booking.status '===' "Cancelled"}} selected {{/ifCond}} value="Cancelled">Cancel</option>
                                         </select>

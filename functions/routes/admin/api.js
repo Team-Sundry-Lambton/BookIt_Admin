@@ -58,20 +58,22 @@ app.post('/email/send/', async (req, res) => {
     try {
         const bookingId = req.body.bookingId;
         var data = await getBookingByBookingId(bookingId);
-        console.log(data);
+        //console.log(data);
         data = data[0];
-        emailClient = data.client.email;
+        /* emailClient = data.client.email;
         subjectClient =  'Invoice #' + bookingId;
         contentClient =  generateInvoiceContent(bookingId, data, true);
+        exportPDF(bookingId, data, res, true); */
+        exportPDF(bookingId, data, res, true);
 
-        emailVendor = data.vendor.email;
-        subjectVendor =  'Invoice #' + bookingId;
-        contentVendor =  generateInvoiceContent(bookingId, data, false);
+        // emailVendor = data.vendor.email;
+        // subjectVendor =  'Invoice #' + bookingId;
+        // contentVendor =  generateInvoiceContent(bookingId, data, false);
+        exportPDF(bookingId, data, res, false);
 
-        sendEmail(emailClient, subjectClient, contentClient);
-        sendEmail(emailVendor, subjectVendor, contentVendor);
+        
+        //sendEmail(emailVendor, subjectVendor, contentVendor);
 
-        //exportPDF(bookingId, data, res);
         res.status(200).json({ 
             "result": true,
             message: 'Email sent successfully.' 
@@ -156,7 +158,7 @@ async function sendEmail(email, subject, content){
     await transport.sendMail(mailOptions)
 }
 
-function generateInvoiceContent(bookingId, data, isClient) {
+function generateInvoiceContent(bookingId, data, url, isClient) {
     var total = 0;
     if(isClient){
         total = parseFloat(data.service.price).toFixed(1);
@@ -170,6 +172,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
 
     const title = isClient ? "service" : "booking";
     const name = isClient ? data.client.firstName + " " + data.client.lastName : data.vendor.firstName + " " + data.vendor.lastName;
+    const invoiceURL = url;
     const content = isClient ? `
                 <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                     <tbody>
@@ -553,7 +556,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                                                                                                                                                 <tbody>
                                                                                                                                                     <tr>
                                                                                                                                                     <td align="left" class="m_-2308682559127387126Uber18_text_p2" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:20px;text-align:left;direction:ltr">
-                                                                                                                                                        <a href="${data.booking.invoiceURL}" style="text-decoration:none;color:#276ef1" target="_blank">Download PDF</a>
+                                                                                                                                                        <a href="${invoiceURL}" style="text-decoration:none;color:#276ef1" target="_blank">Download PDF</a>
                                                                                                                                                     </td>
                                                                                                                                                     </tr>
                                                                                                                                                 </tbody>
@@ -646,10 +649,12 @@ app.get('/invoice/export/:id', async (req, res) => {
     await exportPDF(bookingId, data, res);
 });
 
-async function exportPDF(bookingId, data, res){
+async function exportPDF(bookingId, data, res, isClient){
+    console.log("Exporting ", isClient ? "client invoice" : "vendor invoice");
     const rootPath = path.join(__dirname, '../../../../');
-    if(!data.booking.hasOwnProperty('invoiceURL')){
-        const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
+    const pdfTitle = isClient ? "client_" + bookingId : "vendor_" + bookingId;
+    //if(!data.booking.hasOwnProperty('invoiceURL')){
+        const pdfFilePath = `${rootPath}/public/invoices/invoice_${pdfTitle}.pdf`;
         const htmlContent = generateInvoiceHtml(bookingId, data); 
         const pdfBuffer = await createPDF(htmlContent);
     
@@ -669,7 +674,7 @@ async function exportPDF(bookingId, data, res){
         pdfStream.on('finish', async () => {
           // Upload the PDF file to Firebase Storage
           const fileUploadResult = await bucket.upload(pdfFilePath, {
-            destination: `invoices/invoice_${data.service.serviceId}.pdf`
+            destination: `invoices/invoice_${pdfTitle}.pdf`
           });
     
           // Delete the PDF file from the local filesystem
@@ -681,17 +686,22 @@ async function exportPDF(bookingId, data, res){
             action: 'read',
             expires: '03-31-2024' // Set the expiration date of the URL
           });
+
+            email = isClient? data.client.email : data.vendor.email;
+            subject =  'Invoice #' + bookingId;
+            content =  generateInvoiceContent(bookingId, data, url[0], true);
+            sendEmail(email, subject, content);
     
-          res.download(pdfFilePath);
-          await updateInvoiceBooking(bookingId, url[0]);
+          //res.download(pdfFilePath);
+          await updateInvoiceBooking(data.id, url[0], isClient);
           console.log(`PDF file has been exported, uploaded to Firebase Storage, and downloaded. URL: ${url}`);
     
         });
         pdfStream.end();
-    } else {
+    /* } else {
         const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
         res.download(pdfFilePath);
-    }
+    } */
 }
   
 async function createPDF(htmlContent) {

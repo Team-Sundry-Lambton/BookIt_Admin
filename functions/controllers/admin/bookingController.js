@@ -198,6 +198,8 @@ const getBookingByBookingId = async (id) => {
       if (!querySnapshot.empty) {
         const bookingDoc = querySnapshot.docs[0];
         const booking = bookingDoc.data();
+        const id = bookingDoc.id;
+        //console.log("id:", id);
         let vendor = null;
         let client = null;
         let service = null;
@@ -262,6 +264,7 @@ const getBookingByBookingId = async (id) => {
         booking.date = convertedDate;
 
         result.push({
+          id: id,
           booking: booking,
           vendor: vendor,
           client: client,
@@ -306,18 +309,27 @@ const updateBooking = async (req, res, next) => {
   }
 };
 
-const updateInvoiceBooking = async (bookingId, url) => {
+const updateInvoiceBooking = async (bookingId, url, isClient) => {
   console.log('updating bookingId:', bookingId);
   try {
     const booking = await dbCollection.doc(bookingId);
-    const updateResult = booking.update({
-      invoiceURL: url
-    })
-      .then(function() {
-        console.log("Document successfully updated!");
-        res.redirect('/admin/booking/index');
+    if(isClient){
+      const updateResult = booking.update({
+        invoiceClientURL: url
       })
-      .catch(function(error) {console.error("Error deleting document: ", error);});
+        .then(function() {
+          console.log("Document successfully updated!");
+        })
+        .catch(function(error) {console.error("Error deleting document: ", error);});
+    } else {
+      const updateResults = booking.update({
+        invoiceVendorURL: url
+      })
+        .then(function() {
+          console.log("Document successfully updated!");
+        })
+        .catch(function(error) {console.error("Error deleting document: ", error);});
+    }
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

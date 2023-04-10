@@ -37,15 +37,16 @@ app.use(function(req, res, next) {
   next();
 });
   
-app.get('/:id', isLoggedIn, async (req,res) =>{
+app.get('/:id', async (req,res) =>{
     var adminUser = req.session.user;
     var currentUrl = req.originalUrl;
     const id = req.params.id;
     var data = await getBooking(id);
     data = data[0];
     var total = 0;
-    var applicationFee = data.service.price/100*10;
-    total = parseInt(data.service.price) + parseInt(applicationFee);
+    var applicationFee = parseFloat(data.service.price/100*10).toFixed(1);
+    totalClient = parseFloat(data.service.price).toFixed(1);
+    totalVendor = parseFloat(data.service.price).toFixed(1) - applicationFee;
     
     res.render('./admin/booking/invoice',{
         adminUser, 
@@ -57,7 +58,8 @@ app.get('/:id', isLoggedIn, async (req,res) =>{
         bookingId: id,
         data: data,
         applicationFee: applicationFee,
-        total: total
+        totalClient: totalClient,
+        totalVendor: totalVendor
     });
 });
 

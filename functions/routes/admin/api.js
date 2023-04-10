@@ -58,20 +58,22 @@ app.post('/email/send/', async (req, res) => {
     try {
         const bookingId = req.body.bookingId;
         var data = await getBookingByBookingId(bookingId);
-        console.log(data);
+        //console.log(data);
         data = data[0];
-        emailClient = data.client.email;
+        /* emailClient = data.client.email;
         subjectClient =  'Invoice #' + bookingId;
         contentClient =  generateInvoiceContent(bookingId, data, true);
+        exportPDF(bookingId, data, res, true); */
+        exportPDF(bookingId, data, res, true);
 
-        emailVendor = data.vendor.email;
-        subjectVendor =  'Invoice #' + bookingId;
-        contentVendor =  generateInvoiceContent(bookingId, data, false);
+        // emailVendor = data.vendor.email;
+        // subjectVendor =  'Invoice #' + bookingId;
+        // contentVendor =  generateInvoiceContent(bookingId, data, false);
+        exportPDF(bookingId, data, res, false);
 
-        sendEmail(emailClient, subjectClient, contentClient);
-        sendEmail(emailVendor, subjectVendor, contentVendor);
+        
+        //sendEmail(emailVendor, subjectVendor, contentVendor);
 
-        //exportPDF(bookingId, data, res);
         res.status(200).json({ 
             "result": true,
             message: 'Email sent successfully.' 
@@ -156,8 +158,8 @@ async function sendEmail(email, subject, content){
     await transport.sendMail(mailOptions)
 }
 
-function generateInvoiceContent(bookingId, data, isClient) {
-    var total = 0;
+function generateInvoiceContent(bookingId, data, url, isClient) {
+    var total = 0.0;
     if(isClient){
         total = parseFloat(data.service.price).toFixed(1);
     } else {
@@ -170,6 +172,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
 
     const title = isClient ? "service" : "booking";
     const name = isClient ? data.client.firstName + " " + data.client.lastName : data.vendor.firstName + " " + data.vendor.lastName;
+    const invoiceURL = url;
     const content = isClient ? `
                 <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                     <tbody>
@@ -180,7 +183,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                             <tbody>
                                 <tr>
                                 <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">${data.service.serviceTitle}</td>
-                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CA$ ${data.service.price}</td>
+                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CAD$ ${parseFloat(data.service.price).toFixed(1)}</td>
                                 </tr>
                             </tbody>
                             </table>
@@ -189,7 +192,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                                 <tr>
                                 <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Discount
                                 </td>
-                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ 0.0</td>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CAD$ 0.0</td>
                                 </tr>
                             </tbody>
                             </table>
@@ -210,7 +213,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                             <tbody>
                                 <tr>
                                 <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">${data.service.serviceTitle}</td>
-                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CA$ ${data.service.price}</td>
+                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CAD$ ${parseFloat(data.service.price).toFixed(1)}</td>
                                 </tr>
                             </tbody>
                             </table>
@@ -219,7 +222,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                                 <tr>
                                 <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Discount
                                 </td>
-                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ 0.0</td>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CAD$ 0.0</td>
                                 </tr>
                             </tbody>
                             </table>
@@ -228,7 +231,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                                 <tr>
                                 <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Application Fee (10%)
                                 </td>
-                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ ${applicationFee}</td>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CAD$ ${applicationFee}</td>
                                 </tr>
                             </tbody>
                             </table>
@@ -484,7 +487,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                                                                                                                         <tbody>
                                                                                                                         <tr>
                                                                                                                             <td class="m_-2308682559127387126Uber18_p3 m_-2308682559127387126total_head" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:44px;line-height:44px;padding-right:12px;direction:ltr;text-align:left">Total</td>
-                                                                                                                            <td class="m_-2308682559127387126Uber18_p3 m_-2308682559127387126total_head" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:44px;line-height:44px;text-align:right;direction:ltr">CA$ ${total}</td>
+                                                                                                                            <td class="m_-2308682559127387126Uber18_p3 m_-2308682559127387126total_head" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:44px;line-height:44px;text-align:right;direction:ltr">CAD$ ${total}</td>
                                                                                                                         </tr>
                                                                                                                         </tbody>
                                                                                                                     </table>
@@ -553,7 +556,7 @@ function generateInvoiceContent(bookingId, data, isClient) {
                                                                                                                                                 <tbody>
                                                                                                                                                     <tr>
                                                                                                                                                     <td align="left" class="m_-2308682559127387126Uber18_text_p2" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:20px;text-align:left;direction:ltr">
-                                                                                                                                                        <a href="${data.booking.invoiceURL}" style="text-decoration:none;color:#276ef1" target="_blank">Download PDF</a>
+                                                                                                                                                        <a href="${invoiceURL}" style="text-decoration:none;color:#276ef1" target="_blank">Download PDF</a>
                                                                                                                                                     </td>
                                                                                                                                                     </tr>
                                                                                                                                                 </tbody>
@@ -646,11 +649,13 @@ app.get('/invoice/export/:id', async (req, res) => {
     await exportPDF(bookingId, data, res);
 });
 
-async function exportPDF(bookingId, data, res){
+async function exportPDF(bookingId, data, res, isClient){
+    console.log("Exporting ", isClient ? "client invoice" : "vendor invoice");
     const rootPath = path.join(__dirname, '../../../../');
-    if(!data.booking.hasOwnProperty('invoiceURL')){
-        const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
-        const htmlContent = generateInvoiceHtml(bookingId, data); 
+    const pdfTitle = isClient ? "client_" + bookingId : "vendor_" + bookingId;
+    //if(!data.booking.hasOwnProperty('invoiceURL')){
+        const pdfFilePath = `${rootPath}/public/invoices/invoice_${pdfTitle}.pdf`;
+        const htmlContent = generateInvoiceHtml(bookingId, data, isClient); 
         const pdfBuffer = await createPDF(htmlContent);
     
         if (!pdfBuffer || pdfBuffer.length === 0) {
@@ -669,7 +674,7 @@ async function exportPDF(bookingId, data, res){
         pdfStream.on('finish', async () => {
           // Upload the PDF file to Firebase Storage
           const fileUploadResult = await bucket.upload(pdfFilePath, {
-            destination: `invoices/invoice_${data.service.serviceId}.pdf`
+            destination: `invoices/invoice_${pdfTitle}.pdf`
           });
     
           // Delete the PDF file from the local filesystem
@@ -681,17 +686,22 @@ async function exportPDF(bookingId, data, res){
             action: 'read',
             expires: '03-31-2024' // Set the expiration date of the URL
           });
+
+            email = isClient? data.client.email : data.vendor.email;
+            subject =  'Invoice #' + bookingId;
+            content =  generateInvoiceContent(bookingId, data, url[0], isClient);
+            sendEmail(email, subject, content);
     
-          res.download(pdfFilePath);
-          await updateInvoiceBooking(bookingId, url[0]);
+          //res.download(pdfFilePath);
+          await updateInvoiceBooking(data.id, url[0], isClient);
           console.log(`PDF file has been exported, uploaded to Firebase Storage, and downloaded. URL: ${url}`);
     
         });
         pdfStream.end();
-    } else {
+    /* } else {
         const pdfFilePath = `${rootPath}/public/invoices/invoice_${data.service.serviceId}.pdf`;
         res.download(pdfFilePath);
-    }
+    } */
 }
   
 async function createPDF(htmlContent) {
@@ -720,18 +730,77 @@ async function createPDF(htmlContent) {
     return pdfBuffer;
 }
   
-function generateInvoiceHtml(bookingId, data) {
+function generateInvoiceHtml(bookingId, data, isClient) {
     var total = 0;
-    var applicationFee = data.service.price/100*10;
-    total = parseInt(data.service.price) + parseInt(applicationFee);
-    const timeZone = 'America/New_York';
-    const today = moment().tz(timeZone).format('MMMM DD, YYYY');
+    var applicationFee = parseFloat(data.service.price/100*10).toFixed(1);
+    totalClient = parseFloat(data.service.price).toFixed(1);
+    totalVendor = parseFloat(data.service.price).toFixed(1) - applicationFee;
+    // const timeZone = 'America/New_York';
+    // const today = moment().tz(timeZone).format('MMMM DD, YYYY');
+    var contactDetail = isClient ?
+    `
+    <td>
+    <strong>${data.client.firstName} ${data.client.firstName}</strong><br/>
+        ${data.client.email}<br />
+        ${data.client.contactNumber}
+    </td>`
+  :
+  `<td>
+    <strong>${data.vendor.firstName} ${data.vendor.firstName}</strong><br />
+    ${data.vendor.email}<br />
+    ${data.vendor.contactNumber}<br />
+    </td>
+    `;
+
+    var infoMoney = isClient ? 
+    `
+    <tr class="item">
+        <td>${data.service.serviceTitle}</td>
+
+        <td>CAD$ ${parseFloat(data.service.price).toFixed(1)}</td>
+    </tr>
+
+    <tr class="item">
+        <td>Discount</td>
+
+        <td>CAD$ 0.0</td>
+    </tr>
+    <tr class="total">
+        <td>TOTAL:</td>
+        <td>$${totalClient}</td>
+    </tr>
+    `
+    :
+    `
+    <tr class="item">
+        <td>${data.service.serviceTitle}</td>
+
+        <td>CAD$ ${parseFloat(data.service.price).toFixed(1)}</td>
+    </tr>
+
+    <tr class="item">
+        <td>Discount</td>
+
+        <td>CAD$ 0.0</td>
+    </tr>
+    <tr class="item">
+        <td>Application Fee(10%)</td>
+
+        <td>CAD$ ${applicationFee}</td>
+    </tr>
+    <tr class="total">
+        <td>TOTAL:</td>
+        <td>CAD$ ${totalVendor}</td>
+    </tr>
+    `;
+
+
     return `
       <!DOCTYPE html>
       <html>
         <head>
           <meta charset="utf-8" />
-          <title>INVOICE #${data.service.serviceId}</title>
+          <title>INVOICE #${bookingId}</title>
   
           <style>
             .invoice-box {
@@ -836,7 +905,7 @@ function generateInvoiceHtml(bookingId, data) {
                   <table>
                     <tr>
                       <td class="title">
-                        <img src="https://firebasestorage.googleapis.com/v0/b/fir-dd2bd.appspot.com/o/logo.png?alt=media&token=6b06ac79-04a6-40f8-a2fb-dec7bdad0ce4" style="width: 100%; max-width: 300px" />
+                        <img src="https://firebasestorage.googleapis.com/v0/b/fir-dd2bd.appspot.com/o/logo.png?alt=media&token=6b06ac79-04a6-40f8-a2fb-dec7bdad0ce4" style="width: 100%; max-width: 20px" />
                       </td>
   
                       <td>
@@ -851,17 +920,7 @@ function generateInvoiceHtml(bookingId, data) {
                 <td colspan="2">
                   <table>
                     <tr>
-                      <td>
-                        <strong>${data.vendor.firstName} ${data.vendor.firstName}</strong><br />
-                        ${data.vendor.email}<br />
-                        ${data.vendor.contactNumber}<br />
-                      </td>
-  
-                      <td>
-                      <strong>${data.client.firstName} ${data.client.firstName}</strong><br/>
-                        ${data.client.email}<br />
-                        ${data.client.contactNumber}
-                      </td>
+                        ${contactDetail}
                     </tr>
                   </table>
                 </td>
@@ -885,21 +944,7 @@ function generateInvoiceHtml(bookingId, data) {
                 <td>PRICE</td>
               </tr>
   
-              <tr class="item">
-                <td>${data.service.serviceTitle}</td>
-  
-                <td>$${data.service.price}</td>
-              </tr>
-  
-              <tr class="item">
-                <td>APPLICATION FEE(10%)</td>
-  
-                <td>$${applicationFee}</td>
-              </tr>
-              <tr class="total">
-                <td>TOTAL:</td>
-                <td>$${total}</td>
-              </tr>
+              ${infoMoney}
             </table>
           </div>
         </body>

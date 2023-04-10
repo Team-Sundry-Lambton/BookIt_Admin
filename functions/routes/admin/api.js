@@ -25,7 +25,8 @@ const path = require('path');
 const rootFolder = process.cwd();
 const {
   getBooking,
-  updateInvoiceBooking
+  updateInvoiceBooking,
+  getBookingByBookingId
 } = require(path.join(rootFolder, "/controllers/admin/bookingController"));
 
 
@@ -34,7 +35,7 @@ const { OAuth2Client } = require('google-auth-library');
 
 const GOOGLE_MAILER_CLIENT_ID = '384103339430-27qqhu0at6qnh5of61onuvicaf1094kg.apps.googleusercontent.com'
 const GOOGLE_MAILER_CLIENT_SECRET = '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'
-const GOOGLE_MAILER_REFRESH_TOKEN = '1//04hMr66cGLALOCgYIARAAGAQSNwF-L9IrDapDARzYOx-pZV964EdVepXqqLMVYhpU3QVIJKzA9VPX_5bqLgdA3htPTq_Ywe__3IA'
+const GOOGLE_MAILER_REFRESH_TOKEN = '1//04jd53rpxNmPgCgYIARAAGAQSNwF-L9IrhR1pjs3oj0xREaozy-oSfC2c1WiK6-u0s5lIOmlH6Y-CmgLnJxgl7SFL21E5qvnEeTs'
 const ADMIN_EMAIL_ADDRESS = 'bookit032023@gmail.com'
 
 const myOAuth2Client = new OAuth2Client(
@@ -56,38 +57,25 @@ app.post('/export', async (req, res) => {
 app.post('/email/send/', async (req, res) => {
     try {
         const bookingId = req.body.bookingId;
-        var data = await getBooking(bookingId);
+        var data = await getBookingByBookingId(bookingId);
+        console.log(data);
         data = data[0];
-        email = data.client.email;
-        emailCC = data.vendor.email;
-        subject =  'Invoice #' + data.service.serviceId;
-        content =  generateInvoiceContent(bookingId, data);
+        emailClient = data.client.email;
+        subjectClient =  'Invoice #' + bookingId;
+        contentClient =  generateInvoiceContent(bookingId, data, true);
+
+        emailVendor = data.vendor.email;
+        subjectVendor =  'Invoice #' + bookingId;
+        contentVendor =  generateInvoiceContent(bookingId, data, false);
+
+        sendEmail(emailClient, subjectClient, contentClient);
+        sendEmail(emailVendor, subjectVendor, contentVendor);
 
         //exportPDF(bookingId, data, res);
-        const myAccessTokenObject = await myOAuth2Client.getAccessToken()
-        const myAccessToken = myAccessTokenObject?.token
-        const transport = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            type: 'OAuth2',
-            user: ADMIN_EMAIL_ADDRESS,
-            clientId: GOOGLE_MAILER_CLIENT_ID,
-            clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
-            refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
-            accessToken: myAccessToken
-        }
+        res.status(200).json({ 
+            "result": true,
+            message: 'Email sent successfully.' 
         })
-        const mailOptions = {
-            to: email,
-            cc: emailCC,
-            subject: subject,
-            html: content,
-            headers: {
-                'Content-Type': 'text/html'
-            }
-        };
-        //await transport.sendMail(mailOptions)
-        res.status(200).json({ message: 'Email sent successfully.' })
     } catch (error) {
         console.log(error)
         res.status(500).json({ errors: error.message })
@@ -99,12 +87,15 @@ app.post('/email/send/:id', async (req, res) => {
         const bookingId = req.params.id;
         var data = await getBooking(bookingId);
         data = data[0];
-        email = data.client.email;
-        emailCC = data.vendor.email;
-        subject =  'Invoice #' + data.service.serviceId;
-        content =  generateInvoiceContent(bookingId, data);
+        emailClient = data.client.email;
+        subjectClient =  'Invoice #' + data.service.serviceId;
+        contentClient =  generateInvoiceContent(bookingId, data, true);
 
-        const myAccessTokenObject = await myOAuth2Client.getAccessToken()
+        emailVendor = data.vendor.email;
+        subjectVendor =  'Invoice #' + data.service.serviceId;
+        contentVendor =  generateInvoiceContent(bookingId, data, false);
+
+        /* const myAccessTokenObject = await myOAuth2Client.getAccessToken()
         const myAccessToken = myAccessTokenObject?.token
         const transport = nodemailer.createTransport({
         service: 'gmail',
@@ -126,10 +117,13 @@ app.post('/email/send/:id', async (req, res) => {
                 'Content-Type': 'text/html'
             }
         };
-        await transport.sendMail(mailOptions)
+        await transport.sendMail(mailOptions) */
+
+        //sendEmail(emailClient, subjectClient, contentClient);
+        //sendEmail(emailVendor, subjectVendor, contentVendor);
         res.status(200).json({ 
                                 result: true,
-                                message: 'Email sent successfully.'
+                                message: 'Email sent ssuccessfully.'
                              })
     } catch (error) {
         console.log(error)
@@ -137,12 +131,115 @@ app.post('/email/send/:id', async (req, res) => {
     }
 })
 
-function generateInvoiceContent(bookingId, data) {
+async function sendEmail(email, subject, content){
+    const myAccessTokenObject = await myOAuth2Client.getAccessToken()
+    const myAccessToken = myAccessTokenObject?.token
+    const transport = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        type: 'OAuth2',
+        user: ADMIN_EMAIL_ADDRESS,
+        clientId: GOOGLE_MAILER_CLIENT_ID,
+        clientSecret: GOOGLE_MAILER_CLIENT_SECRET,
+        refresh_token: GOOGLE_MAILER_REFRESH_TOKEN,
+        accessToken: myAccessToken
+    }
+    })
+    const mailOptions = {
+        to: email,
+        subject: subject,
+        html: content,
+        headers: {
+            'Content-Type': 'text/html'
+        }
+    };
+    await transport.sendMail(mailOptions)
+}
+
+function generateInvoiceContent(bookingId, data, isClient) {
     var total = 0;
-    var applicationFee = data.service.price/100*10;
-    total = parseInt(data.service.price) + parseInt(applicationFee);
-    const timeZone = 'America/New_York';
-    const today = moment().tz(timeZone).format('MMMM DD, YYYY');
+    if(isClient){
+        total = parseFloat(data.service.price).toFixed(1);
+    } else {
+        var applicationFee = parseFloat(data.service.price/100*10).toFixed(1);
+        total = parseFloat(data.service.price).toFixed(1) - applicationFee;
+    }
+
+    /* const timeZone = 'America/New_York';
+    const today = moment().tz(timeZone).format('MMMM DD, YYYY'); */
+
+    const title = isClient ? "service" : "booking";
+    const name = isClient ? data.client.firstName + " " + data.client.lastName : data.vendor.firstName + " " + data.vendor.lastName;
+    const content = isClient ? `
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                    <tbody>
+                    <tr>
+                        <td align="left" style="padding-left:12px;padding-right:12px">
+                        <span class="im">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                            <tbody>
+                                <tr>
+                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">${data.service.serviceTitle}</td>
+                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CA$ ${data.service.price}</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                            <tbody>
+                                <tr>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Discount
+                                </td>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ 0.0</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+    `
+    :
+    `
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                    <tbody>
+                    <tr>
+                        <td align="left" style="padding-left:12px;padding-right:12px">
+                        <span class="im">
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                            <tbody>
+                                <tr>
+                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">${data.service.serviceTitle}</td>
+                                <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CA$ ${data.service.price}</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                            <tbody>
+                                <tr>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Discount
+                                </td>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ 0.0</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
+                            <tbody>
+                                <tr>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Application Fee (10%)
+                                </td>
+                                <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ ${applicationFee}</td>
+                                </tr>
+                            </tbody>
+                            </table>
+                        </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+    `
+    ;
+
     return `
     <div id="invoice">
         <div class="aHl"></div>
@@ -296,7 +393,7 @@ function generateInvoiceContent(bookingId, data) {
                                                                                                                                                     <table border="0" cellpadding="0" cellspacing="0" width="100%" align="left" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                                                                                                                                                     <tbody>
                                                                                                                                                         <tr>
-                                                                                                                                                        <td class="m_-2308682559127387126Uber18_p3 m_-2308682559127387126header_h3" style="color:#000;font-family:uber18-medium,Helvetica,Arial,sans-serif;font-size:34px;line-height:38px;padding-bottom:13px;direction:ltr;text-align:left">Thanks for your service, ${data.client.firstName} ${data.client.firstName}</td>
+                                                                                                                                                        <td class="m_-2308682559127387126Uber18_p3 m_-2308682559127387126header_h3" style="color:#000;font-family:uber18-medium,Helvetica,Arial,sans-serif;font-size:34px;line-height:38px;padding-bottom:13px;direction:ltr;text-align:left">Thanks for your ${title}, ${name}</td>
                                                                                                                                                         </tr>
                                                                                                                                                         <tr>
                                                                                                                                                         <td class="m_-2308682559127387126Uber18_text_p1" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;direction:ltr;text-align:left">
@@ -418,33 +515,7 @@ function generateInvoiceContent(bookingId, data) {
                                                                                                                 </tr>
                                                                                                                 </tbody>
                                                                                                             </table>
-                                                                                                            <table width="100%" border="0" cellpadding="0" cellspacing="0" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
-                                                                                                                <tbody>
-                                                                                                                <tr>
-                                                                                                                    <td align="left" style="padding-left:12px;padding-right:12px">
-                                                                                                                    <span class="im">
-                                                                                                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
-                                                                                                                        <tbody>
-                                                                                                                            <tr>
-                                                                                                                            <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">${data.service.serviceTitle}</td>
-                                                                                                                            <td class="m_-2308682559127387126Uber18_text_p3" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-top:5px;text-align:right;direction:ltr">CA$ ${data.service.price}</td>
-                                                                                                                            </tr>
-                                                                                                                        </tbody>
-                                                                                                                        </table>
-                                                                                                                        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
-                                                                                                                        <tbody>
-                                                                                                                            <tr>
-                                                                                                                            <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="left" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:12px;padding-top:5px;direction:ltr;text-align:left">Application Fee (10%)
-                                                                                                                            </td>
-                                                                                                                            <td class="m_-2308682559127387126Uber18_text_p1" valign="top" align="right" style="color:#000;font-family:UberMoveText,open sans,helvetica neue,Helvetica,sans-serif;font-size:16px;line-height:28px;padding-bottom:5px;padding-right:0;padding-top:5px;text-align:right;direction:ltr">CA$ ${applicationFee}</td>
-                                                                                                                            </tr>
-                                                                                                                        </tbody>
-                                                                                                                        </table>
-                                                                                                                    </span>
-                                                                                                                    </td>
-                                                                                                                </tr>
-                                                                                                                </tbody>
-                                                                                                            </table>
+                                                                                                            ${content}
                                                                                                             
                                                                                                             <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border:none;border-collapse:collapse;border-spacing:0;width:100%">
                                                                                                                 <tbody>

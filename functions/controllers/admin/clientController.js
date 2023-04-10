@@ -10,7 +10,7 @@ const reviewCollection = admin.firestore().collection('vendorReview');
 
 async function getListClients() {
   try {
-    const querySnapshot = await dbCollection.orderBy('clientId', 'asc').get();
+    const querySnapshot = await dbCollection.orderBy('firstName', 'asc').get();
     const results = [];
     for (const doc of querySnapshot.docs) {
       const data = doc.data();

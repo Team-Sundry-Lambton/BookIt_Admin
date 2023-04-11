@@ -1,15 +1,5 @@
 const express = require('express')
 let app = express.Router()
-const session = require('express-session');
-app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false, // Set secure: true if using HTTPS
-    maxAge: 3600000 // Set the session to expire in 1 hour
-  } 
-}));
 const { addVendor } = require('../../../controllers/admin/vendorController');
 
 // Middleware to check if the user is logged in

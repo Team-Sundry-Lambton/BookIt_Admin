@@ -1,22 +1,21 @@
 const express = require('express')
 let app = express.Router()
-const admin = require('firebase-admin');
-const session = require('express-session');
+const session = require('cookie-session');
 app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false, // Set secure: true if using HTTPS
-    maxAge: 3600000 // Set the session to expire in 1 hour
-  } 
-}));
-
+  name: 'session',
+  keys: ['yourSecretKey'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 // Middleware to check if the user is logged in
+
 const isLoggedIn = (req, res, next) => {
+    res.setHeader('Cache-Control', 'private');
+    console.log("user:", req.session);
     if (req.session.user) {
+      console.log("go to 1");
       next();
     } else {
+      console.log("go to 2");
       res.redirect('/admin/login');
     }
   };

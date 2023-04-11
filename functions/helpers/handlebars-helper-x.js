@@ -243,11 +243,6 @@ Handlebars.registerHelper('ifCond', function (v1, operator, v2, options) {
   }
 });
 
-const moment = require('moment');
-Handlebars.registerHelper('formatDate', function(date) {
-  return moment(date).format('MMMM Do YYYY, h:mm:ss a');
-});
-
 Handlebars.registerHelper('times', function(n, block) {
   var accum = '';
   for(var i = 1; i <= n; ++i)

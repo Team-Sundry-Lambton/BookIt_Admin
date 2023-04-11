@@ -2,16 +2,12 @@ const express = require('express')
 let app = express.Router()
 const admin = require('firebase-admin');
 const bcrypt = require("bcryptjs")
-const session = require('express-session');
+const session = require('cookie-session');
 app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false, // Set secure: true if using HTTPS
-    maxAge: 3600000 // Set the session to expire in 1 hour
-  } 
-}));
+  name: 'session',
+  keys: ['yourSecretKey'],
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 const adminsCollection = admin.firestore().collection('admins');
 
@@ -26,7 +22,6 @@ app.post('/', async (req, res) => {
   const isLoggedIn = await loginData(req);
   if (isLoggedIn) {
     res.redirect('/admin/dashboard');
-    //res.redirect('/admin/service/edit/LqQ9j44gfy1C71CEAdwT');
   } else {
     const errorMsg = "Invalid username or password";
     res.render('./admin/login',{
@@ -50,6 +45,8 @@ async function loginData(req){
       if (passwordMatch) {
         // Create session
         req.session.user = userDoc.data();
+        console.log("Cookie:", userDoc.data());
+        console.log("Cookie:", req.session.user);
         console.log("Login successful");
         return true; // Login successful
       } else {

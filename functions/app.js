@@ -17,13 +17,6 @@ global.perPage = 8;
 
 // Serve static files from the public directory
 app.use(express.static('public'));
-const session = require('express-session');
-app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false } // Set secure: true if using HTTPS
-}));
 
 
 //partials config

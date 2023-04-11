@@ -1,16 +1,5 @@
 const express = require('express')
 let app = express.Router()
-const session = require('express-session');
-const admin = require('firebase-admin');
-app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false, // Set secure: true if using HTTPS
-    maxAge: 3600000 // Set the session to expire in 1 hour
-  } 
-}));
 const bodyParser = require('body-parser');
 const cors = require('cors');
 // Configure middleware
@@ -37,7 +26,7 @@ app.use(function(req, res, next) {
   next();
 });
   
-app.get('/:id', async (req,res) =>{
+app.get('/:id', isLoggedIn, async (req,res) =>{
     var adminUser = req.session.user;
     var currentUrl = req.originalUrl;
     const id = req.params.id;

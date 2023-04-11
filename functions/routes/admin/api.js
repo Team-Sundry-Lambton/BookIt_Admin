@@ -1,19 +1,8 @@
 const express = require('express')
 let app = express.Router()
-const session = require('express-session');
 const admin = require('firebase-admin');
-app.use(session({
-  secret: 'yourSecretKey',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { 
-    secure: false, // Set secure: true if using HTTPS
-    maxAge: 3600000 // Set the session to expire in 1 hour
-  } 
-}));
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const moment = require('moment-timezone');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const bucket = admin.storage().bucket();
